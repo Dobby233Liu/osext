@@ -5,7 +5,7 @@ local ffi = require("ffi")
 OSExt = {}
 
 if ffi.os == "Windows" then
-    libRequire("osext", "win32")
+    libRequire("osext", "win32/init")
 end
 
 -- do not expose any events
