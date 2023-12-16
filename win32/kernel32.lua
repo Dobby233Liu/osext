@@ -1,9 +1,7 @@
 local ffi = require("ffi")
 local bit = require("bit")
 
--- General Win32 interactions
-local win32 = {}
-OSExt.Win32 = win32
+local win32 = OSExt.Win32
 
 win32.Libs = {}
 win32.Libs.kernel32 = ffi.load("kernel32")
@@ -209,6 +207,3 @@ function win32.isWow64Process(process)
     if ret ~= 0 then win32.raiseLastError() end
     return isWow64[0] == 0
 end
-
-libRequire("osext", "win32/psapi")
-libRequire("osext", "win32/secext")
