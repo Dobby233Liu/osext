@@ -1,16 +1,20 @@
 local ffi = require("ffi")
 local bit = require("bit")
 
-local win32 = {}
 -- General Win32 interactions
+local win32 = {}
 OSExt.Win32 = win32
 
 win32.Libs = {}
 win32.Libs.kernel32 = ffi.load("kernel32")
+if not win32.Libs.kernel32 then
+    error("kernel32 not available?!")
+end
 
 win32.HResults = {
     ERROR_SUCCESS = 0,
     ERROR_INVALID_PARAMETER = 0x57,
+    ERROR_MORE_DATA = 0xea,
     ERROR_MR_MID_NOT_FOUND = 0x13d
 }
 
@@ -18,12 +22,14 @@ win32.HResults = {
 ffi.cdef[[
     typedef unsigned int UINT;
     typedef unsigned long DWORD;
+    typedef unsigned long *PULONG;
 ]]
 
 ---@alias OSExt.Win32.BOOL ffi.cdata*
 ffi.cdef[[
     // 0=false 1=true
     typedef bool BOOL;
+    typedef BOOL BOOLEAN;
     typedef BOOL *PBOOL;
     typedef BOOL *LPBOOL;
 ]]
@@ -53,14 +59,21 @@ ffi.cdef[[
     typedef char CHAR;
     typedef CHAR *LPSTR;
     typedef const char *LPCCH;
+    typedef const wchar_t *LPCWCH;
     
     int WideCharToMultiByte(
-        UINT uiCodePage,
+        UINT CodePage,
         DWORD dwFlags,
         LPWSTR lpWideCharStr, int cchWideChar,
         LPSTR lpMultiByteStr, int cbMultiByte,
         LPCCH lpDefaultChar,
         LPBOOL lpUsedDefaultChar
+    );
+    int MultiByteToWideChar(
+        UINT CodePage,
+        DWORD dwFlags,
+        LPSTR lpMultiByteStr, int cbMultiByte,
+        LPWSTR lpWideCharStr, int cchWideChar
     );
 ]]
 win32.CP_UTF8 = 65001
@@ -68,13 +81,30 @@ win32.CP_UTF8 = 65001
 -- (through WideCharToMultiByte instead of handling it ourselves)
 ---@param wideBuf ffi.cdata* # (LPWSTR) widebyte string itself
 ---@param wideLen integer # widebyte string's length (counting \0 I think?)
-function win32.wideString(wideBuf, wideLen)
+---@return string
+function win32.wideToLuaString(wideBuf, wideLen)
     local len = win32.Libs.kernel32.WideCharToMultiByte(win32.CP_UTF8, 0, wideBuf, wideLen, nil, 0, nil, nil)
     if len == 0 then win32.raiseLastError() end
     local buf = ffi.new("char[?]", len)
     local ret = win32.Libs.kernel32.WideCharToMultiByte(win32.CP_UTF8, 0, wideBuf, wideLen, buf, len, nil, nil)
     if ret == 0 then win32.raiseLastError() end
     return ffi.string(buf, ret)
+end
+-- Converts a UTF-8 Lua string to a Win32 wide (UTF-16) string
+-- (through MultiByteToWideChar instead of handling it ourselves)
+---@param str string
+---@return ffi.cdata* wideStr # (LPWSTR)
+---@return integer wideLen # supposed length
+function win32.luaToWideString(str)
+    -- do not use utf8.len here
+    local multiBuf = ffi.new("CHAR[?]", #str, str)
+    local multiLen = #str+1
+    local len = win32.Libs.kernel32.MultiByteToWideChar(win32.CP_UTF8, 0, multiBuf, multiLen, nil, 0)
+    if len == 0 then win32.raiseLastError() end
+    local buf = ffi.new("WCHAR[?]", len)
+    local ret = win32.Libs.kernel32.MultiByteToWideChar(win32.CP_UTF8, 0, multiBuf, multiLen, buf, len)
+    if ret == 0 then win32.raiseLastError() end
+    return buf, ret
 end
 
 ffi.cdef[[
@@ -121,7 +151,7 @@ function win32.getSystemMessage(messageId, languageId)
             win32.HResults.ERROR_INVALID_PARAMETER
         }, e))
     end
-    return win32.wideString(buf, ret)
+    return win32.widetoLuaString(buf, ret)
 end
 -- {@func OSExt.Win32.getSystemMessage} which automatically trims trailing newlines
 ---@overload fun(messageId: integer, languageId?: integer)
@@ -181,3 +211,4 @@ function win32.isWow64Process(process)
 end
 
 libRequire("osext", "win32/psapi")
+libRequire("osext", "win32/secext")

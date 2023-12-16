@@ -1,0 +1,6 @@
+Win32:
+    - Elevation check
+
+Unix: Everything
+
+Platform-independent functions for common stuff (current process names and username and such)
