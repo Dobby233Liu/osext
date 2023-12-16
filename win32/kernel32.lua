@@ -10,11 +10,6 @@ if not win32.Libs.kernel32 then
     error("kernel32 not available?!")
 end
 
-win32.HANDLE = ffi.typeof("HANDLE")
--- A handle that is invalid
----@type OSExt.Win32.HANDLE
-win32.INVALID_HANDLE_VALUE = ffi.cast(win32.HANDLE, -1)
----@alias OSExt.Win32.HANDLE ffi.cdata*
 ffi.cdef[[
     BOOL CloseHandle(HANDLE hObject);
 ]]

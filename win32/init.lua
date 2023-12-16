@@ -8,14 +8,13 @@ OSExt.Win32 = win32
 
 win32.Libs = {}
 
----@alias OSExt.Win32.DWORD ffi.cdata*
 ffi.cdef[[
     typedef unsigned int UINT;
     typedef unsigned long DWORD;
     typedef unsigned long *PULONG;
 ]]
+---@alias OSExt.Win32.DWORD ffi.cdata*
 
----@alias OSExt.Win32.BOOL ffi.cdata*
 ffi.cdef[[
     // 0=false 1=true
     typedef bool BOOL;
@@ -24,6 +23,7 @@ ffi.cdef[[
     typedef BOOL *PBOOL;
     typedef BOOL *LPBOOL;
 ]]
+---@alias OSExt.Win32.BOOL ffi.cdata*
 
 ffi.cdef[[
     typedef wchar_t WCHAR;
@@ -38,7 +38,14 @@ ffi.cdef[[
 
 ffi.cdef[[
     typedef void *HANDLE;
+]]
+---@alias OSExt.Win32.HANDLE ffi.cdata*
+win32.HANDLE = ffi.typeof("HANDLE")
+-- A handle that is invalid
+---@type OSExt.Win32.HANDLE
+win32.INVALID_HANDLE_VALUE = ffi.cast(win32.HANDLE, -1)
 
+ffi.cdef[[
     typedef const void *LPCVOID;
 ]]
 
