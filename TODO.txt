@@ -1,6 +1,10 @@
+Platform-independent functions for common stuff
+    - current process names
+    - username
+etc.
+
 Win32:
+    - PSApi
     - Elevation check
 
 Unix: Everything
-
-Platform-independent functions for common stuff (current process names and username and such)
