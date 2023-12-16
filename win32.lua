@@ -129,7 +129,7 @@ win32.FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100
 ---@param languageId? integer # desired language of the resulting string, defaults to English (US)
 function win32.getSystemMessage(messageId, languageId)
     -- usually we shouldn't care about locale, but stock fonts have a limited charset
-    languageId = languageId or 0x0409
+    languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
     -- FIXME: let the system allocate the buffer
     local temp_dchar_len = 32768
