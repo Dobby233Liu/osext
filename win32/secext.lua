@@ -43,7 +43,7 @@ ffi.cdef[[
 
 -- Gets the name of the user that is running the game, in a specific format
 ---@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to samCompatible
-function OSExt.Win32.getCurrentUserNameEx(nameFormat)
+function OSExt.Win32.getUserNameEx(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
 
     local len = 1024

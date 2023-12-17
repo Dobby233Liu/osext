@@ -13,9 +13,9 @@ ffi.cdef[[
 ]]
 
 -- Gets the name of the user that is running the game \
--- Inferior to OSExt.Win32.getCurrentUserNameEx, but can return
+-- Inferior to OSExt.Win32.getUserNameEx, but can return
 -- the actual username
-function OSExt.Win32.getCurrentUserName()
+function OSExt.Win32.getUserName()
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len)
     local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
