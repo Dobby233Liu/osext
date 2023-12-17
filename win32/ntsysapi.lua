@@ -11,7 +11,7 @@ function OSExt.Win32.NtSysApi.raiseLuaError(status)
 end
 
 ---@alias OSExt.Win32.OSVERSIONINFO ffi.cdata*
-if not ffi.typeof("OSVERSIONINFOW") then
+if not OSExt._typeExists("OSVERSIONINFOW[1]") then
     ffi.cdef[[
         typedef struct _OSVERSIONINFOW {
             DWORD dwOSVersionInfoSize;

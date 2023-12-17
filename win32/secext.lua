@@ -9,7 +9,6 @@ local ffi = require "ffi"
 OSExt.Win32.Libs.secur32 = ffi.load("secur32")
 if not OSExt.Win32.Libs.secur32 then
     print("secur32 not available")
-    OSExt.Win32 = nil
     return
 end
 
