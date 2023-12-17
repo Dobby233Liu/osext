@@ -81,7 +81,7 @@ ffi.cdef[[
 OSExt.Win32.FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000
 OSExt.Win32.FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200
 OSExt.Win32.FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100
--- For obtaining a user-facing message corresponding to a HRESULT
+-- For obtaining a user-facing message corresponding to a HRESULT \
 -- Note that there may be a trailing newline
 ---@param messageId integer # the HRESULT
 ---@param languageId? integer # desired language of the resulting string, defaults to English (US)
