@@ -40,7 +40,7 @@ OSExt.Win32.CP_UTF8 = 65001
 -- Converts a Win32 wide (UTF-16) string to a UTF-8 Lua string
 -- (through WideCharToMultiByte instead of handling it ourselves)
 ---@param wideBuf ffi.cdata* # (LPWSTR) widebyte string itself
----@param wideLen integer # widebyte string's length (counting \0 I think?)
+---@param wideLen integer # widebyte string's length
 ---@return string
 function OSExt.Win32.wideToLuaString(wideBuf, wideLen)
     local len = OSExt.Win32.Libs.kernel32.WideCharToMultiByte(OSExt.Win32.CP_UTF8, 0, wideBuf, wideLen, nil, 0, nil, nil)
