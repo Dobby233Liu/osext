@@ -5,6 +5,5 @@ etc.
 
 Win32:
     - PSApi
-    - Elevation check
 
 Unix: Everything
