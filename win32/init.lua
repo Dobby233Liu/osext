@@ -1,12 +1,11 @@
 local ffi = require("ffi")
 
-local win32 = {}
 -- General Win32 interactions
 --
 -- Most stuff in the root scope comes from kernel32
-OSExt.Win32 = win32
+OSExt.Win32 = {}
 
-win32.Libs = {}
+OSExt.Win32.Libs = {}
 
 ffi.cdef[[
     typedef unsigned int UINT;
@@ -40,16 +39,16 @@ ffi.cdef[[
     typedef void *HANDLE;
 ]]
 ---@alias OSExt.Win32.HANDLE ffi.cdata*
-win32.HANDLE = ffi.typeof("HANDLE")
+OSExt.Win32.HANDLE = ffi.typeof("HANDLE")
 -- A handle that is invalid
 ---@type OSExt.Win32.HANDLE
-win32.INVALID_HANDLE_VALUE = ffi.cast(win32.HANDLE, -1)
+OSExt.Win32.INVALID_HANDLE_VALUE = ffi.cast(OSExt.Win32.HANDLE, -1)
 
 ffi.cdef[[
     typedef const void *LPCVOID;
 ]]
 
-win32.HResults = {
+OSExt.Win32.HResults = {
     ERROR_SUCCESS = 0,
     ERROR_INVALID_PARAMETER = 0x57,
     ERROR_MORE_DATA = 0xea,

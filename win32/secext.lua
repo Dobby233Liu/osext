@@ -5,12 +5,10 @@ local ffi = require "ffi"
 -- This provides various functions to deal with user/computer object names
 --
 -- [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/secext/)
-local secext = {}
-OSExt.Win32.SecExt = secext
+OSExt.Win32.SecExt = {}
 
-local win32 = OSExt.Win32
-win32.Libs.secur32 = ffi.load("secur32")
-if not win32.Libs.secur32 then
+OSExt.Win32.Libs.secur32 = ffi.load("secur32")
+if not OSExt.Win32.Libs.secur32 then
     print("secur32 not available")
     OSExt.Win32.SecExt = nil
     return
@@ -18,7 +16,7 @@ end
 
 ---@enum OSExt.Win32.SecExt.NameFormats
 -- This is EXTENDED_NAME_FORMAT in secext.h
-secext.NameFormats = {
+OSExt.Win32.SecExt.NameFormats = {
     nameUnknown = 0,
 
     nameSamCompatible = 2,
@@ -50,41 +48,41 @@ ffi.cdef[[
 
 -- Gets the name of the user that is running the game, in a specific format
 ---@param nameFormat OSExt.Win32.SecExt.NameFormats # defaults to nameSamCompatible
-function secext.getCurrentUserName(nameFormat)
-    nameFormat = nameFormat or secext.NameFormats.nameSamCompatible
+function OSExt.Win32.SecExt.getCurrentUserName(nameFormat)
+    nameFormat = nameFormat or OSExt.Win32.SecExt.NameFormats.nameSamCompatible
 
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len)
     local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
-    local ret = win32.Libs.secur32.GetUserNameExW(nameFormat, buf, lenBuf)
+    local ret = OSExt.Win32.Libs.secur32.GetUserNameExW(nameFormat, buf, lenBuf)
     if ret == 0 then
-        local e = win32.Libs.kernel32.GetLastError()
-        if e == win32.HResults.ERROR_MORE_DATA then
+        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
             error("Internal error - buffer is too small, my fault")
         end
-        win32.raiseLuaError(e)
+        OSExt.Win32.raiseLuaError(e)
     end
-    return win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, len-1)
 end
 
 -- This is noop
 --[[
 -- Gets the name of the computer that is running the game, in a specific format
 ---@param nameFormat OSExt.Win32.SecExt.NameFormats # defaults to nameSamCompatible
-function secext.getComputerName(nameFormat)
-    nameFormat = nameFormat or secext.NameFormats.nameSamCompatible
+function OSExt.Win32.SecExt.getComputerName(nameFormat)
+    nameFormat = nameFormat or OSExt.Win32.SecExt.NameFormats.nameSamCompatible
 
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len)
     local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
-    local ret = win32.Libs.secur32.GetComputerObjectNameW(nameFormat, buf, lenBuf)
+    local ret = OSExt.Win32.Libs.secur32.GetComputerObjectNameW(nameFormat, buf, lenBuf)
     if ret == 0 then
-        local e = win32.Libs.kernel32.GetLastError()
-        if e == win32.HResults.ERROR_MORE_DATA then
+        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
             error("Internal error - buffer is too small, my fault")
         end
-        win32.raiseLuaError(e)
+        OSExt.Win32.raiseLuaError(e)
     end
-    return win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, len-1)
 end
 ]]
