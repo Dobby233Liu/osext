@@ -5,37 +5,33 @@ local ffi = require "ffi"
 -- This provides various functions to deal with user/computer object names
 --
 -- [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/secext/)
-OSExt.Win32.SecExt = {}
 
 OSExt.Win32.Libs.secur32 = ffi.load("secur32")
 if not OSExt.Win32.Libs.secur32 then
     print("secur32 not available")
-    OSExt.Win32.SecExt = nil
+    OSExt.Win32 = nil
     return
 end
 
----@enum OSExt.Win32.SecExt.NameFormats
--- This is EXTENDED_NAME_FORMAT in secext.h
-OSExt.Win32.SecExt.NameFormats = {
-    nameUnknown = 0,
+---@enum OSExt.Win32.EXTENDED_NAME_FORMAT
+OSExt.Win32.EXTENDED_NAME_FORMAT = {
+    samCompatible = 2,
 
-    nameSamCompatible = 2,
+    canonical = 7,
+    canonicalEx = 9,
 
-    nameCanonical = 7,
-    nameCanonicalEx = 9,
+    uniqueId = 6,
 
-    nameUniqueId = 6,
+    display = 3,
+    givenName = 13,
+    surName = 14,
 
-    nameDisplay = 3,
-    nameGivenName = 13,
-    nameSurName = 14,
-
-    nameUserPrincipal = 8,
-    nameServicePrincipal = 10,
+    userPrincipal = 8,
+    servicePrincipal = 10,
 
     -- DN stands for uhh domain name IDK what you were thinking about
-    nameFullyQualifiedDN = 1,
-    nameDnsDomain = 12,
+    fullyQualifiedDN = 1,
+    dnsDomain = 12,
 }
 
 ffi.cdef[[
@@ -43,13 +39,13 @@ ffi.cdef[[
     typedef int EXTENDED_NAME_FORMAT;
 
     BOOLEAN GetUserNameExW(EXTENDED_NAME_FORMAT NameFormat, LPWSTR lpNameBuffer, PULONG nSize);
-    //BOOLEAN GetComputerObjectNameW(EXTENDED_NAME_FORMAT NameFormat, LPWSTR lpNameBuffer, PULONG nSize);
+    BOOLEAN GetComputerObjectNameW(EXTENDED_NAME_FORMAT NameFormat, LPWSTR lpNameBuffer, PULONG nSize);
 ]]
 
 -- Gets the name of the user that is running the game, in a specific format
----@param nameFormat OSExt.Win32.SecExt.NameFormats # defaults to nameSamCompatible
-function OSExt.Win32.SecExt.getCurrentUserNameEx(nameFormat)
-    nameFormat = nameFormat or OSExt.Win32.SecExt.NameFormats.nameSamCompatible
+---@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to samCompatible
+function OSExt.Win32.getCurrentUserNameEx(nameFormat)
+    nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
 
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len)
@@ -65,18 +61,22 @@ function OSExt.Win32.SecExt.getCurrentUserNameEx(nameFormat)
     return OSExt.Win32.wideToLuaString(buf, len-1)
 end
 
--- This is noop
---[[
 -- Gets the name of the computer that is running the game, in a specific format
----@param nameFormat OSExt.Win32.SecExt.NameFormats # defaults to nameSamCompatible
-function OSExt.Win32.SecExt.getComputerName(nameFormat)
-    nameFormat = nameFormat or OSExt.Win32.SecExt.NameFormats.nameSamCompatible
+--
+-- FIXME: ??? Windows API operation failed with error: Configuration information 
+-- could not be read from the domain controller, either because the machine is
+-- unavailable, or access has been denied. (0x00000547)
+--
+-- Use OSExt.Win32.getComputerNameEx instead
+---@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to samCompatible
+function OSExt.Win32.getComputerObjectNameEx(nameFormat)
+    nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
 
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len)
     local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
     local ret = OSExt.Win32.Libs.secur32.GetComputerObjectNameW(nameFormat, buf, lenBuf)
-    if ret == 0 then
+    if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
             error("Internal error - buffer is too small, my fault")
@@ -85,4 +85,3 @@ function OSExt.Win32.SecExt.getComputerName(nameFormat)
     end
     return OSExt.Win32.wideToLuaString(buf, len-1)
 end
-]]
