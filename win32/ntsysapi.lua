@@ -25,7 +25,7 @@ ffi.cdef[[
     NTSTATUS RtlGetVersion(LPOSVERSIONINFOW lpVersionInformation);
 ]]
 
--- Compared to kernel32 GetVersionEx, this returns the true version in Windows 10+
+-- Compared to WINBASEAPI GetVersionEx, this returns the true version in Windows 10+
 ---@return OSExt.Win32.OSVERSIONINFO
 function OSExt.Win32.NtSysApi.getVersion()
     local info = ffi.new("OSVERSIONINFOW[1]")
