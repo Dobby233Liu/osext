@@ -1,7 +1,7 @@
 local ffi = require("ffi")
 local bit = require("bit")
 
--- kernel32 is pretty much for OS stuff
+-- kernel32 (WINBASEAPI) is pretty much for general OS stuff
 
 OSExt.Win32.Libs.kernel32 = ffi.load("kernel32")
 if not OSExt.Win32.Libs.kernel32 then
@@ -166,4 +166,42 @@ function OSExt.Win32.isWow64Process(process)
     local ret = OSExt.Win32.Libs.kernel32.IsWow64Process(process, isWow64)
     if not ret then OSExt.Win32.raiseLastError() end
     return isWow64[0]
+end
+
+---@enum OSExt.Win32.COMPUTER_NAME_FORMAT
+OSExt.Win32.COMPUTER_NAME_FORMAT = {
+    netBIOS = 0,
+    dnsHostname = 1,
+    dnsDomain = 2,
+    dnsFullyQualified = 3,
+    physicalNetBIOS = 4,
+    physicalDnsHostname = 5,
+    physicalDnsDomain = 6,
+    physicalDnsFullyQualified = 7
+}
+
+ffi.cdef[[
+    typedef int COMPUTER_NAME_FORMAT;
+
+    BOOL GetComputerNameExW(COMPUTER_NAME_FORMAT NameType, LPWSTR lpBuffer, LPDWORD nSize);
+]]
+
+-- Gets the name of the computer that is running the game,
+-- in a specific format if needed
+---@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to netBIOS
+function OSExt.Win32.getComputerName(nameFormat)
+    nameFormat = nameFormat or OSExt.Win32.COMPUTER_NAME_FORMAT.netBIOS
+
+    local len = 1024
+    local buf = ffi.new("WCHAR[?]", len)
+    local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
+    local ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
+    if not ret then
+        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+            error("Internal error - buffer is too small, my fault")
+        end
+        OSExt.Win32.raiseLuaError(e)
+    end
+    return OSExt.Win32.wideToLuaString(buf, len-1)
 end

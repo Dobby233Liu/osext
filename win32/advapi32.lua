@@ -1,9 +1,8 @@
 local ffi = require "ffi"
 
 -- Implements some advapi32.dll interfaces
---
--- Advanced APIs that BaseApi doesn't cover
 
+-- Contains advanced APIs that basesrv doesn't cover
 OSExt.Win32.Libs.advapi32 = ffi.load("advapi32")
 if not OSExt.Win32.Libs.advapi32 then
     error("advapi32 not available?")
