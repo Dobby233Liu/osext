@@ -48,14 +48,14 @@ ffi.cdef[[
 
 -- Gets the name of the user that is running the game, in a specific format
 ---@param nameFormat OSExt.Win32.SecExt.NameFormats # defaults to nameSamCompatible
-function OSExt.Win32.SecExt.getCurrentUserName(nameFormat)
+function OSExt.Win32.SecExt.getCurrentUserNameEx(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.SecExt.NameFormats.nameSamCompatible
 
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len)
     local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
     local ret = OSExt.Win32.Libs.secur32.GetUserNameExW(nameFormat, buf, lenBuf)
-    if ret == 0 then
+    if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
             error("Internal error - buffer is too small, my fault")

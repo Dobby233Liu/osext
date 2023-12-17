@@ -90,9 +90,9 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
     languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
     -- FIXME: let the system allocate the buffer
-    local temp_dchar_len = 32768
+    local temp_dchar_len = 8192
     local buf = ffi.new("WCHAR[?]", temp_dchar_len)
-    local ret = OSExt.Win32.Libs.kernel32.FormatMessageW(
+    local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
         bit.bor(
             OSExt.Win32.FORMAT_MESSAGE_FROM_SYSTEM,
             OSExt.Win32.FORMAT_MESSAGE_IGNORE_INSERTS--[[,
@@ -102,14 +102,14 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
         buf, temp_dchar_len - 1,
         nil
     )
-    if ret == 0 then
+    if len == 0 then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         -- guard against stack overflow
         OSExt.Win32.raiseLuaError(e, not Utils.containsValue({
             OSExt.Win32.HResults.ERROR_INVALID_PARAMETER
         }, e))
     end
-    return OSExt.Win32.widetoLuaString(buf, ret)
+    return OSExt.Win32.wideToLuaString(buf, len)
 end
 -- {@func OSExt.Win32.getSystemMessage} which automatically trims trailing newlines
 ---@overload fun(messageId: integer, languageId?: integer)
@@ -164,6 +164,6 @@ function OSExt.Win32.isWow64Process(process)
 
     local isWow64 = ffi.new("BOOL[1]", false)
     local ret = OSExt.Win32.Libs.kernel32.IsWow64Process(process, isWow64)
-    if ret ~= 0 then OSExt.Win32.raiseLastError() end
-    return isWow64[0] == 0
+    if not ret then OSExt.Win32.raiseLastError() end
+    return isWow64[0]
 end
