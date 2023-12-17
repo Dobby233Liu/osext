@@ -21,6 +21,10 @@ function OSExt.Win32.makeHandle(handle)
 end
 
 ffi.cdef[[
+    HLOCAL LocalFree(HLOCAL hMem);
+]]
+
+ffi.cdef[[
     int WideCharToMultiByte(
         UINT CodePage,
         DWORD dwFlags,
@@ -57,8 +61,8 @@ end
 ---@return integer wideLen # supposed length
 function OSExt.Win32.luaToWideString(str)
     -- do not use utf8.len here
-    local multiBuf = ffi.new("CHAR[?]", #str, str)
-    local multiLen = #str+1
+    local multiBuf = ffi.new("CHAR[?]", #str+1, str)
+    local multiLen = #str
     local len = OSExt.Win32.Libs.kernel32.MultiByteToWideChar(OSExt.Win32.CP_UTF8, 0, multiBuf, multiLen, nil, 0)
     if len == 0 then OSExt.Win32.raiseLastError() end
     local buf = ffi.new("WCHAR[?]", len)
@@ -90,8 +94,8 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
     languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
     -- FIXME: let the system allocate the buffer
-    local temp_dchar_len = 8192
-    local buf = ffi.new("WCHAR[?]", temp_dchar_len)
+    local bufLen = 8192
+    local buf = ffi.new("WCHAR[?]", bufLen)
     local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
         bit.bor(
             OSExt.Win32.FORMAT_MESSAGE_FROM_SYSTEM,
@@ -99,7 +103,7 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
             OSExt.Win32.FORMAT_MESSAGE_ALLOCATE_BUFFER]]
         ), nil,
         messageId, languageId,
-        buf, temp_dchar_len - 1,
+        buf, bufLen - 1,
         nil
     )
     if len == 0 then

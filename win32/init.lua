@@ -46,6 +46,7 @@ OSExt.Win32.HANDLE = ffi.typeof("HANDLE")
 ---@type OSExt.Win32.HANDLE
 OSExt.Win32.INVALID_HANDLE_VALUE = ffi.cast(OSExt.Win32.HANDLE, -1)
 ffi.cdef[[
+    typedef HANDLE HLOCAL;
     typedef HANDLE HINSTANCE;
     typedef HINSTANCE HMODULE;
 ]]
