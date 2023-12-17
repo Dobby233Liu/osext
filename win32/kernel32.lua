@@ -110,8 +110,7 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         -- guard against stack overflow
         OSExt.Win32.raiseLuaError(e, not Utils.containsValue({
-            OSExt.Win32.HResults.ERROR_INVALID_PARAMETER,
-            OSExt.Win32.HResults.ERROR_MORE_DATA,
+            OSExt.Win32.HResults.ERROR_INVALID_PARAMETER
         }, e))
     end
     return OSExt.Win32.wideToLuaString(buf, len)
