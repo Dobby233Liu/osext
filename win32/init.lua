@@ -10,6 +10,7 @@ OSExt.Win32.Libs = {}
 ffi.cdef[[
     typedef unsigned int UINT;
     typedef unsigned long DWORD;
+    typedef unsigned long *LPDWORD;
     typedef unsigned long *PULONG;
 ]]
 ---@alias OSExt.Win32.DWORD ffi.cdata*
@@ -56,5 +57,6 @@ OSExt.Win32.HResults = {
 }
 
 libRequire("osext", "win32/kernel32")
+libRequire("osext", "win32/advapi32")
 libRequire("osext", "win32/psapi")
 libRequire("osext", "win32/secext")
