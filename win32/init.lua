@@ -67,8 +67,8 @@ OSExt.Win32.NtStatusFacilities = {
     FACILITY_WIN32 = 7
 }
 
+libRequire("osext", "win32/ntdll")
 libRequire("osext", "win32/kernel32")
 libRequire("osext", "win32/advapi32")
-libRequire("osext", "win32/psapi")
 libRequire("osext", "win32/secext")
-libRequire("osext", "win32/ntsysapi")
+libRequire("osext", "win32/psapi")

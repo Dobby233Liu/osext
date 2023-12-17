@@ -3,11 +3,6 @@ local ffi = require("ffi")
 -- Think of this like hidden system APIs that are not in kernel32
 OSExt.Win32.NtSysApi = {}
 
-OSExt.Win32.Libs.ntdll = ffi.load("ntdll")
-if not OSExt.Win32.Libs.ntdll then
-    error("ntdll not available?!")
-end
-
 -- Raises a Lua error from a NTSTATUS (temporary, TODO)
 function OSExt.Win32.NtSysApi.raiseLuaError(status)
     if status ~= OSExt.Win32.NtStatuses.STATUS_SUCCESS then
