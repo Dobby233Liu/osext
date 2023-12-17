@@ -12,6 +12,7 @@ ffi.cdef[[
     typedef unsigned long DWORD;
     typedef unsigned long *LPDWORD;
     typedef unsigned long *PULONG;
+    typedef long LONG;
 ]]
 ---@alias OSExt.Win32.DWORD ffi.cdata*
 
@@ -49,14 +50,25 @@ ffi.cdef[[
     typedef const void *LPCVOID;
 ]]
 
+ffi.cdef[[
+    typedef LONG HRESULT;
+    typedef LONG NTSTATUS;
+]]
 OSExt.Win32.HResults = {
     ERROR_SUCCESS = 0,
     ERROR_INVALID_PARAMETER = 0x57,
     ERROR_MORE_DATA = 0xea,
     ERROR_MR_MID_NOT_FOUND = 0x13d
 }
+OSExt.Win32.NtStatuses = {
+    STATUS_SUCCESS = 0
+}
+OSExt.Win32.NtStatusFacilities = {
+    FACILITY_WIN32 = 7
+}
 
 libRequire("osext", "win32/kernel32")
 libRequire("osext", "win32/advapi32")
 libRequire("osext", "win32/psapi")
 libRequire("osext", "win32/secext")
+libRequire("osext", "win32/ntsysapi")
