@@ -13,7 +13,7 @@ ffi.cdef[[
 ]]
 
 -- Gets the name of the user that is running the game \
--- Inferior to OSExt.Win32.SecExt.getCurrentUserNameEx, but can return
+-- Inferior to OSExt.Win32.getCurrentUserNameEx, but can return
 -- the actual username
 function OSExt.Win32.getCurrentUserName()
     local len = 1024

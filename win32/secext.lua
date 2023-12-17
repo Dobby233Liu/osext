@@ -67,7 +67,7 @@ end
 -- could not be read from the domain controller, either because the machine is
 -- unavailable, or access has been denied. (0x00000547)
 --
--- Use OSExt.Win32.getComputerNameEx instead
+-- Use OSExt.Win32.getComputerName instead
 ---@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to samCompatible
 function OSExt.Win32.getComputerObjectNameEx(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
