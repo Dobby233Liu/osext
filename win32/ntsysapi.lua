@@ -8,6 +8,13 @@ if not OSExt.Win32.Libs.ntdll then
     error("ntdll not available?!")
 end
 
+-- Raises a Lua error from a NTSTATUS (temporary, TODO)
+function OSExt.Win32.NtSysApi.raiseLuaError(status)
+    if status ~= OSExt.Win32.NtStatuses.STATUS_SUCCESS then
+        error(string.format("NTSYSAPI operation resulted in NTSTATUS %08x", status))
+    end
+end
+
 ---@alias OSExt.Win32.OSVERSIONINFO ffi.cdata*
 if not ffi.typeof("OSVERSIONINFOW") then
     ffi.cdef[[
@@ -31,7 +38,8 @@ function OSExt.Win32.NtSysApi.getVersion()
     local info = ffi.new("OSVERSIONINFOW[1]")
     info[0].dwOSVersionInfoSize = ffi.sizeof(info[0])
     local ret = OSExt.Win32.Libs.ntdll.RtlGetVersion(info[0])
-    -- TODO: NTSTATUS handling
-    if ret ~= OSExt.Win32.NtStatuses.STATUS_SUCCESS then error("NT error") end
+    if ret ~= OSExt.Win32.NtStatuses.STATUS_SUCCESS then
+        OSExt.Win32.NtSysApi.raiseLuaError(ret)
+    end
     return info[0]
 end
