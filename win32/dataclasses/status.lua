@@ -21,23 +21,24 @@ OSExt.Win32.Status.FACILITY_KINDS = {
 
 ---@private
 function OSExt.Win32.Status:init()
-    self.severity = OSExt.Win32.Status.SEVERITY.success
     self.customer = false
     self.facility = 0 -- FIXME
     self.facility_kind = OSExt.Win32.Status.FACILITY_KINDS.hResult
     self.code = 0 -- FIXME
+    self.severity = OSExt.Win32.Status.SEVERITY.success
 end
 
 function OSExt.Win32.Status:fromWin32(w32Error)
     assert(w32Error >= 0)
     local status = OSExt.Win32.Status()
+    status.customer = false
+    status.facility_kind = OSExt.Win32.Status.FACILITY_KINDS.hResult
+    status.facility = OSExt.Win32.NtStatusFacilities.FACILITY_WIN32 -- FIXME
+    status.code = w32Error
     if w32Error == 0 --[[ FIXME ]] then
         status.severity = OSExt.Win32.Status.SEVERITY.success
     else
         status.severity = OSExt.Win32.Status.SEVERITY.failure
     end
-    status.facility_kind = OSExt.Win32.Status.FACILITY_KINDS.hResult
-    status.facility = OSExt.Win32.NtStatusFacilities.FACILITY_WIN32 -- FIXME
-    status.code = w32Error
     return status
 end
