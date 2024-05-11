@@ -12,6 +12,8 @@ ffi.cdef[[
     typedef unsigned long DWORD;
     typedef unsigned long *LPDWORD;
     typedef unsigned long *PULONG;
+    typedef unsigned long ULONG_PTR;
+    typedef ULONG_PTR SIZE_T;
     typedef long LONG;
 ]]
 ---@alias OSExt.Win32.DWORD ffi.cdata*
@@ -63,8 +65,10 @@ ffi.cdef[[
 ]]
 OSExt.Win32.HResults = {
     ERROR_SUCCESS = 0,
+    ERROR_NO_MORE_FILES = 0x12,
     ERROR_INVALID_PARAMETER = 0x57,
     ERROR_MORE_DATA = 0xea,
+    ERROR_PARTIAL_COPY = 0x12b,
     ERROR_MR_MID_NOT_FOUND = 0x13d
 }
 OSExt.Win32.NtStatuses = {
