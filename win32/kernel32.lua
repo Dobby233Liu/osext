@@ -82,9 +82,11 @@ ffi.cdef[[
         va_list *Arguments
     );
 ]]
-OSExt.Win32.FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000
-OSExt.Win32.FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200
-OSExt.Win32.FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100
+OSExt.Win32.FormatMessageFlags = {
+    fromSystem = 0x00001000,
+    ignoreInserts = 0x00000200,
+    allocateBuffer = 0x00000100
+}
 -- For obtaining a user-facing message corresponding to a HRESULT \
 -- Note that there may be a trailing newline
 ---@param messageId integer # the HRESULT
@@ -95,15 +97,14 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
 
     -- FIXME: let the system allocate the buffer
     local bufLen = 8192
-    local buf = ffi.new("WCHAR[?]", bufLen)
+    local buf = ffi.new("WCHAR[?]", bufLen+1)
     local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
         bit.bor(
-            OSExt.Win32.FORMAT_MESSAGE_FROM_SYSTEM,
-            OSExt.Win32.FORMAT_MESSAGE_IGNORE_INSERTS--[[,
-            OSExt.Win32.FORMAT_MESSAGE_ALLOCATE_BUFFER]]
+            OSExt.Win32.FormatMessageFlags.fromSystem,
+            OSExt.Win32.FormatMessageFlags.ignoreInserts
         ), nil,
         messageId, languageId,
-        buf, bufLen - 1,
+        buf, bufLen+1,
         nil
     )
     if len == 0 then
