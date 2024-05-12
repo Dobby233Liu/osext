@@ -20,10 +20,10 @@ ffi.cdef[[
 
 ---@param process OSExt.Win32.HANDLE # process handle
 ---@return string imageName # how the kernel sees it at least (TODO)
-function OSExt.Win32.getProcessImageName(process)
+function OSExt.Win32.getProcessImageFilename(process)
     local len = 1024
-    local buf = ffi.new("WCHAR[?]", len)
-    local ret = OSExt.Win32.Libs.kernel32.K32GetProcessImageFileNameW(process, buf, len-1)
+    local buf = ffi.new("WCHAR[?]", len+1)
+    local ret = OSExt.Win32.Libs.kernel32.K32GetProcessImageFileNameW(process, buf, len+1)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
@@ -31,17 +31,17 @@ function OSExt.Win32.getProcessImageName(process)
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, len)
 end
 
 ---@param process OSExt.Win32.HANDLE # process handle
 ---@param module OSExt.Win32.HMODULE # process handle
----@return string imageName # how the kernel sees it at least (TODO)
+---@return string imageName
 function OSExt.Win32.getModuleBaseName(process, module)
     process = OSExt.Win32.makeHandle(process)
     local len = 1024
-    local buf = ffi.new("WCHAR[?]", len)
-    local ret = OSExt.Win32.Libs.kernel32.K32GetModuleBaseNameW(process, module, buf, len-1)
+    local buf = ffi.new("WCHAR[?]", len+1)
+    local ret = OSExt.Win32.Libs.kernel32.K32GetModuleBaseNameW(process, module, buf, len+1)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
@@ -49,5 +49,5 @@ function OSExt.Win32.getModuleBaseName(process, module)
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, len)
 end

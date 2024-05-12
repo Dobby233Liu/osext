@@ -8,11 +8,12 @@ OSExt.Win32 = {}
 OSExt.Win32.Libs = {}
 
 ffi.cdef[[
+    typedef uint8_t BYTE;
     typedef unsigned int UINT;
     typedef unsigned long DWORD;
     typedef unsigned long *LPDWORD;
     typedef unsigned long *PULONG;
-    typedef unsigned long ULONG_PTR;
+    typedef uintptr_t ULONG_PTR;
     typedef ULONG_PTR SIZE_T;
     typedef long LONG;
 ]]
@@ -56,8 +57,15 @@ ffi.cdef[[
 ---@alias OSExt.Win32.HMODULE OSExt.Win32.HINSTANCE
 
 ffi.cdef[[
+    typedef void *LPVOID;
     typedef const void *LPCVOID;
 ]]
+
+if not OSExt._typeExists("char[MAX_PATH]") then
+    ffi.cdef[[
+        enum { MAX_PATH = 260 };
+    ]]
+end
 
 ffi.cdef[[
     typedef LONG HRESULT;
@@ -83,3 +91,4 @@ libRequire("osext", "win32/kernel32")
 libRequire("osext", "win32/advapi32")
 libRequire("osext", "win32/secext")
 libRequire("osext", "win32/psapi")
+libRequire("osext", "win32/toolhelp32")

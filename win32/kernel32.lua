@@ -151,13 +151,19 @@ end
 
 ffi.cdef[[
     HANDLE GetCurrentProcess();
+    DWORD GetCurrentProcessId();
     BOOL IsWow64Process(HANDLE hProcess, PBOOL Wow64Process);
 ]]
 
 -- For obtaining a pseudo handle to the current process
----@return OSExt.Win32.HANDLE handle # (normally INVALID_HANDLE_VALUE)
+---@return OSExt.Win32.HANDLE handle # (can be INVALID_HANDLE_VALUE)
 function OSExt.Win32.getCurrentProcess()
     return OSExt.Win32.Libs.kernel32.GetCurrentProcess()
+end
+
+-- Returns the PID of the current process
+function OSExt.Win32.getCurrentProcessId()
+    return OSExt.Win32.Libs.kernel32.GetCurrentProcessId()
 end
 
 -- Checks whether a process is running with x86-32 compat layer or not
@@ -192,13 +198,13 @@ ffi.cdef[[
 
 -- Gets the name of the computer that is running the game,
 -- in a specific format if needed
----@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to netBIOS
+---@param nameFormat OSExt.Win32.COMPUTER_NAME_FORMAT # defaults to netBIOS
 function OSExt.Win32.getComputerName(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.COMPUTER_NAME_FORMAT.netBIOS
 
-    local len = 1024
-    local buf = ffi.new("WCHAR[?]", len)
-    local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
+    local len = 15
+    local buf = ffi.new("WCHAR[?]", len+1)
+    local lenBuf = ffi.new("DWORD[1]", len+1) -- seriously
     local ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
@@ -207,5 +213,5 @@ function OSExt.Win32.getComputerName(nameFormat)
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end

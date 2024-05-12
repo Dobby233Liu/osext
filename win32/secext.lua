@@ -47,8 +47,8 @@ function OSExt.Win32.getUserNameEx(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
 
     local len = 1024
-    local buf = ffi.new("WCHAR[?]", len)
-    local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
+    local buf = ffi.new("WCHAR[?]", len+1)
+    local lenBuf = ffi.new("DWORD[1]", len+1) -- seriously
     local ret = OSExt.Win32.Libs.secur32.GetUserNameExW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
@@ -57,7 +57,7 @@ function OSExt.Win32.getUserNameEx(nameFormat)
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end
 
 -- Gets the name of the computer that is running the game, in a specific format
@@ -71,9 +71,9 @@ end
 function OSExt.Win32.getComputerObjectNameEx(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
 
-    local len = 1024
-    local buf = ffi.new("WCHAR[?]", len)
-    local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
+    local len = 15
+    local buf = ffi.new("WCHAR[?]", len+1)
+    local lenBuf = ffi.new("DWORD[1]", len) -- seriously
     local ret = OSExt.Win32.Libs.secur32.GetComputerObjectNameW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
@@ -82,5 +82,5 @@ function OSExt.Win32.getComputerObjectNameEx(nameFormat)
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end

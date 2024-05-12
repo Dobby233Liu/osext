@@ -6,12 +6,12 @@ OSExt = {}
 
 ---@private
 function OSExt._typeExists(type)
-    local throwaway
-    return select(1, pcall(
+    local _
+    return ({pcall(
         function()
-            throwaway = ffi.new(type)
+            _ = ffi.typeof(type)
         end)
-    )
+    })[1]
 end
 
 if ffi.os == "Windows" then

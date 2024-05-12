@@ -11,7 +11,7 @@ function OSExt.Win32.NtSysApi.raiseLuaError(status)
 end
 
 ---@alias OSExt.Win32.OSVERSIONINFO ffi.cdata*
-if not OSExt._typeExists("OSVERSIONINFOW[1]") then
+if not OSExt._typeExists("OSVERSIONINFOW") then
     ffi.cdef[[
         typedef struct _OSVERSIONINFOW {
             DWORD dwOSVersionInfoSize;
@@ -31,11 +31,11 @@ ffi.cdef[[
 -- Compared to WINBASEAPI GetVersionEx, this returns the true version in Windows 10+
 ---@return OSExt.Win32.OSVERSIONINFO
 function OSExt.Win32.NtSysApi.getVersion()
-    local info = ffi.new("OSVERSIONINFOW[1]")
-    info[0].dwOSVersionInfoSize = ffi.sizeof(info[0])
-    local ret = OSExt.Win32.Libs.ntdll.RtlGetVersion(info[0])
+    local info = ffi.new("OSVERSIONINFOW")
+    info.dwOSVersionInfoSize = ffi.sizeof(info)
+    local ret = OSExt.Win32.Libs.ntdll.RtlGetVersion(info)
     if ret ~= OSExt.Win32.NtStatuses.STATUS_SUCCESS then
         OSExt.Win32.NtSysApi.raiseLuaError(ret)
     end
-    return info[0]
+    return info
 end

@@ -17,8 +17,8 @@ ffi.cdef[[
 -- the actual username
 function OSExt.Win32.getUserName()
     local len = 1024
-    local buf = ffi.new("WCHAR[?]", len)
-    local lenBuf = ffi.new("DWORD[1]", len-1) -- seriously
+    local buf = ffi.new("WCHAR[?]", len+1)
+    local lenBuf = ffi.new("DWORD[1]", len+1) -- seriously
     local ret = OSExt.Win32.Libs.advapi32.GetUserNameW(buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
@@ -27,5 +27,5 @@ function OSExt.Win32.getUserName()
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len-1)
+    return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end
