@@ -12,8 +12,8 @@ if not OSExt.Win32.Libs.secur32 then
     return
 end
 
----@enum OSExt.Win32.EXTENDED_NAME_FORMAT
-OSExt.Win32.EXTENDED_NAME_FORMAT = {
+---@enum OSExt.Win32.ExtendedNameFormat
+OSExt.Win32.ExtendedNameFormat = {
     samCompatible = 2,
 
     canonical = 7,
@@ -42,9 +42,9 @@ ffi.cdef[[
 ]]
 
 -- Gets the name of the user that is running the game, in a specific format
----@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to samCompatible
+---@param nameFormat OSExt.Win32.ExtendedNameFormat # defaults to samCompatible
 function OSExt.Win32.getUserNameEx(nameFormat)
-    nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
+    nameFormat = nameFormat or OSExt.Win32.ExtendedNameFormat.samCompatible
 
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len+1)
@@ -67,9 +67,9 @@ end
 -- unavailable, or access has been denied. (0x00000547)
 --
 -- Use OSExt.Win32.getComputerName instead
----@param nameFormat OSExt.Win32.EXTENDED_NAME_FORMAT # defaults to samCompatible
+---@param nameFormat OSExt.Win32.ExtendedNameFormat # defaults to samCompatible
 function OSExt.Win32.getComputerObjectNameEx(nameFormat)
-    nameFormat = nameFormat or OSExt.Win32.EXTENDED_NAME_FORMAT.samCompatible
+    nameFormat = nameFormat or OSExt.Win32.ExtendedNameFormat.samCompatible
 
     local len = 15
     local buf = ffi.new("WCHAR[?]", len+1)
