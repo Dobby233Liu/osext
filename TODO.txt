@@ -6,4 +6,5 @@ etc.
 Win32:
     - Spicer parts of process operations maybe
 
-Unix: Everything
+Unix:
+    - osver

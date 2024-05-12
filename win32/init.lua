@@ -1,6 +1,6 @@
 local ffi = require("ffi")
 
--- General Win32 interactions
+-- Win32 interfaces
 --
 -- Most stuff in the root scope comes from kernel32
 OSExt.Win32 = {}
