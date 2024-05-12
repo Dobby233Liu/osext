@@ -30,18 +30,18 @@ OSExt.Win32.ToolHelp.SnapshotContents.all = bit.bor(
 
 
 ffi.cdef[[
-    HANDLE CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
+    HANDLE CreateToolHelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
 ]]
 
 -- Takes a snapshot of the specified processes, as well as the heaps, modules, and threads used by these processes.
----@param pid integer # The PID of the process to be included in the snapshot, can be and defaults to \
+---@param pid? integer # The PID of the process to be included in the snapshot, can be and defaults to \
 --- zero to indicate the current process. Used when one of heapList, moduleList, or module32List is being queried, \
 --- otherwise all processes will be included.
 ---@return OSExt.Win32.HANDLE snapshot
 function OSExt.Win32.ToolHelp.createSnapshot(contents, pid)
     pid = pid or 0
 
-    local ret = OSExt.Win32.makeHandle(OSExt.Win32.Libs.tlhelp32.CreateToolhelp32Snapshot(contents, pid))
+    local ret = OSExt.Win32.makeHandle(OSExt.Win32.Libs.tlhelp32.CreateToolHelp32Snapshot(contents, pid))
     if ret == OSExt.Win32.INVALID_HANDLE_VALUE then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         -- TODO: ERROR_PARTIAL_COPY
@@ -86,7 +86,8 @@ ffi.cdef[[
     BOOL Heap32Next(LPHEAPENTRY32 lphe);
 ]]
 
-function OSExt.Win32.ToolHelp.iterHeaps(snapshot)
+-- Iterator for heap lists in a ToolHelp snapshot
+function OSExt.Win32.ToolHelp.iterHeapLists(snapshot)
     local i = 0
     local info = ffi.new("HEAPLIST32")
     info.dwSize = ffi.sizeof(info)
@@ -110,7 +111,8 @@ function OSExt.Win32.ToolHelp.iterHeaps(snapshot)
     end
 end
 
-function OSExt.Win32.ToolHelp.iterHeap(heapList)
+-- Iterator for a heap list snapshotted by ToolHelp
+function OSExt.Win32.ToolHelp.iterHeapList(heapList)
     -- FIXME: "If the target process dies, the system may create a new process using the same process identifier.
     -- "Therefore, the caller should maintain a reference to the target process as long as it is using Heap32Next."
     local i = 0
@@ -164,6 +166,7 @@ ffi.cdef[[
     BOOL Module32NextW(HANDLE hSnapshot, LPMODULEENTRY32W lpme);
 ]]
 
+-- Iterator for modules in a ToolHelp snapshot
 function OSExt.Win32.ToolHelp.iterModules(snapshot)
     local i = 0
     local info = ffi.new("MODULEENTRY32W")
@@ -210,6 +213,7 @@ ffi.cdef[[
     BOOL Process32NextW(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
 ]]
 
+-- Iterator for processes in a ToolHelp snapshot
 function OSExt.Win32.ToolHelp.iterProcesses(snapshot)
     local i = 0
     local info = ffi.new("PROCESSENTRY32W")
@@ -253,6 +257,7 @@ ffi.cdef[[
     BOOL Thread32Next(HANDLE hSnapshot, LPTHREADENTRY32 lpte);
 ]]
 
+-- Iterator for threads in a ToolHelp snapshot
 function OSExt.Win32.ToolHelp.iterThreads(snapshot)
     local i = 0
     local info = ffi.new("THREADENTRY32")
@@ -279,24 +284,41 @@ end
 
 
 ffi.cdef[[
-    BOOL Toolhelp32ReadProcessMemory(
+    BOOL ToolHelp32ReadProcessMemory(
         DWORD       th32ProcessID,
-        ULONG_PTR   lpBaseAddress,
+        ULONG_PTR   lpBaseAddress, // FIXME: this is supposed to be a LPCVOID
         LPVOID      lpBuffer,
         SIZE_T      cbRead,
         SIZE_T      *lpNumberOfBytesRead
     );
 ]]
 
+-- Reads size bytes at the specific base address of a process' memory
+--
 -- dunno why would you want this but whatever \
 -- ReadProcessMemory would be more useful
 function OSExt.Win32.ToolHelp.readProcessMemory(pid, address, size)
     local buffer = ffi.new("char[?]", size)
     local lenBuf = ffi.new("SIZE_T[1]", size)
-    local result = OSExt.Win32.Libs.tlhelp32.Toolhelp32ReadProcessMemory(pid, address, buffer, size, lenBuf)
+    local result = OSExt.Win32.Libs.tlhelp32.ToolHelp32ReadProcessMemory(pid, address, buffer, size, lenBuf)
     if not result then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         OSExt.Win32.raiseLuaError(e)
     end
     return buffer, lenBuf[0]
+end
+
+
+-- ~~~~~~~~~~~~~~~~ end of toolhelp API interop ~~~~~~~~~~~~~~~~
+
+
+-- For obtaining a list of the currently running processes on the computer
+---@return table names
+function OSExt.Win32.getProcessNames()
+    local snapshot = OSExt.Win32.ToolHelp.createSnapshot(OSExt.Win32.ToolHelp.SnapshotContents.processList)
+    local names = {}
+    for _, process in OSExt.Win32.ToolHelp.iterProcesses(snapshot) do
+        table.insert(names, OSExt.Win32.wideToLuaString(process.szExeFile, ffi.C.MAX_PATH))
+    end
+    return names
 end

@@ -49,10 +49,10 @@ OSExt.Win32.CP_UTF8 = 65001
 function OSExt.Win32.wideToLuaString(wideBuf, wideLen)
     local len = OSExt.Win32.Libs.kernel32.WideCharToMultiByte(OSExt.Win32.CP_UTF8, 0, wideBuf, wideLen, nil, 0, nil, nil)
     if len == 0 then OSExt.Win32.raiseLastError() end
-    local buf = ffi.new("char[?]", len)
-    local ret = OSExt.Win32.Libs.kernel32.WideCharToMultiByte(OSExt.Win32.CP_UTF8, 0, wideBuf, wideLen, buf, len, nil, nil)
+    local buf = ffi.new("char[?]", len+1)
+    local ret = OSExt.Win32.Libs.kernel32.WideCharToMultiByte(OSExt.Win32.CP_UTF8, 0, wideBuf, wideLen, buf, len+1, nil, nil)
     if ret == 0 then OSExt.Win32.raiseLastError() end
-    return ffi.string(buf, ret)
+    return ffi.string(buf) -- result is probably null-terminated
 end
 -- Converts a UTF-8 Lua string to a Win32 wide (UTF-16) string
 -- (through MultiByteToWideChar instead of handling it ourselves)
