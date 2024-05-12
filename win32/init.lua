@@ -11,6 +11,7 @@ ffi.cdef[[
     typedef uint8_t BYTE;
     typedef unsigned int UINT;
     typedef unsigned long DWORD;
+    typedef unsigned long *PDWORD;
     typedef unsigned long *LPDWORD;
     typedef unsigned long *PULONG;
     typedef uintptr_t ULONG_PTR;

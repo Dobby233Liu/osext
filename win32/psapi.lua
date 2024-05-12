@@ -30,8 +30,8 @@ ffi.cdef[[
 ]]
 
 -- Opens an existing local process object.
----@param processId number # process id
----@param accessRights number # access rights, defaults to queryInformation
+---@param processId integer # process id
+---@param accessRights? integer # access rights, defaults to queryInformation
 ---@return OSExt.Win32.HANDLE handle
 function OSExt.Win32.openProcess(processId, accessRights)
     if accessRights == nil then
@@ -50,14 +50,16 @@ end
 
 
 ffi.cdef[[
-    DWORD K32GetProcessImageFileNameW(HANDLE hProcess, LPWSTR lpImageFileName, DWORD nSize);
+    //DWORD K32GetProcessImageFileNameW(HANDLE hProcess, LPWSTR lpImageFileName, DWORD nSize);
     DWORD K32GetModuleBaseNameW(HANDLE hProcess, HMODULE hModule, LPWSTR lpBaseName, DWORD nSize);
 ]]
 
--- For obtaining the full path to a process' image file.
+--[[
+-- For obtaining the full path to a process' image file in device form.
 ---@param process OSExt.Win32.HANDLE # process handle
----@return string imageName # how the kernel sees it at least (TODO)
-function OSExt.Win32.getProcessImageFileName(process)
+---@return string imageName
+function OSExt.Win32.getProcessImageFileNameNative(process)
+    --process = OSExt.Win32.markHandleForGC(process)
     ---@diagnostic disable-next-line: assign-type-mismatch
     local len = ffi.C.MAX_PATH ---@type integer
     local buf = ffi.new("WCHAR[?]", len)
@@ -71,13 +73,14 @@ function OSExt.Win32.getProcessImageFileName(process)
     end
     return OSExt.Win32.wideToLuaString(buf, len)
 end
+]]
 
 -- For obtaining the base name of one of a process' modules.
 ---@param process OSExt.Win32.HANDLE # process handle
 ---@param module OSExt.Win32.HMODULE # module handle
 ---@return string imageName
 function OSExt.Win32.getModuleBaseName(process, module)
-    process = OSExt.Win32.markHandleForGC(process)
+    --process = OSExt.Win32.markHandleForGC(process)
     ---@diagnostic disable-next-line: assign-type-mismatch
     local len = ffi.C.MAX_PATH ---@type integer
     local buf = ffi.new("WCHAR[?]", len)
@@ -90,4 +93,29 @@ function OSExt.Win32.getModuleBaseName(process, module)
         OSExt.Win32.raiseLuaError(e)
     end
     return OSExt.Win32.wideToLuaString(buf, len)
+end
+
+
+ffi.cdef[[
+    BOOL QueryFullProcessImageNameW(HANDLE hProcess, DWORD dwFlags, LPWSTR lpExeName, PDWORD lpdwSize);
+]]
+-- For obtaining the full path to a process' image file in device form.
+---@param process OSExt.Win32.HANDLE # process handle
+---@param nativeStyle boolean
+---@return string imageName
+function OSExt.Win32.getProcessImageFileName(process, nativeStyle)
+    --process = OSExt.Win32.markHandleForGC(process)
+    ---@diagnostic disable-next-line: assign-type-mismatch
+    local len = ffi.C.MAX_PATH ---@type integer
+    local buf = ffi.new("WCHAR[?]", len)
+    local lenBuf = ffi.new("DWORD[1]", len)
+    local ret = OSExt.Win32.Libs.kernel32.QueryFullProcessImageNameW(process, nativeStyle or false, buf, lenBuf)
+    if not ret then
+        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+            error("Internal error - buffer is too small, my fault")
+        end
+        OSExt.Win32.raiseLuaError(e)
+    end
+    return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end

@@ -44,8 +44,14 @@ function OSExt.Win32.ToolHelp.createSnapshot(contents, pid)
     local ret = OSExt.Win32.markHandleForGC(OSExt.Win32.Libs.tlhelp32.CreateToolhelp32Snapshot(contents, pid))
     if ret == OSExt.Win32.INVALID_HANDLE_VALUE then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        -- TODO: ERROR_PARTIAL_COPY
-        OSExt.Win32.raiseLuaError(e)
+        local msg = OSExt.Win32.makeErrorString(e)
+        if e == OSExt.Win32.HResults.ERROR_PARTIAL_COPY
+            and (OSExt.Win32.isWow64Process()
+                and not OSExt.Win32.isWow64Process(OSExt.Win32.openProcess(pid)))
+        then
+            msg = msg .. ". Note that a WoW64 process can't spy on a proper 64-bit process."
+        end
+        error(msg)
     end
     return ret
 end

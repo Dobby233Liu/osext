@@ -130,17 +130,23 @@ ffi.cdef[[
     DWORD GetLastError();
 ]]
 
+-- Makes a friendly error string from a Win32 API error
+---@param w32Error integer # the HRESULT
+---@param format? boolean # whether to get a readable error message or not
+function OSExt.Win32.makeErrorString(w32Error, format)
+    if format == nil then format = true end
+    local message = ""
+    if format then
+        message = OSExt.Win32.getSystemMessageTrimmed(w32Error) .. " "
+    end
+    return string.format("Windows API operation failed with error: %s(0x%08x)", message, w32Error)
+end
 -- Raises a Lua error from a Win32 API error
 ---@param w32Error integer # the HRESULT
 ---@param format? boolean # whether to get a readable error message or not
 function OSExt.Win32.raiseLuaError(w32Error, format)
-    if format == nil then format = true end
     if w32Error ~= OSExt.Win32.HResults.ERROR_SUCCESS then
-        local message = ""
-        if format then
-            message = OSExt.Win32.getSystemMessageTrimmed(w32Error) .. " "
-        end
-        error(string.format("Windows API operation failed with error: %s(0x%08x)", message, w32Error))
+        error(OSExt.Win32.makeErrorString(w32Error, format))
     end
 end
 -- Raises a Lua error from the last Win32 API error
