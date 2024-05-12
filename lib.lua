@@ -18,7 +18,7 @@ if ffi.os == "Windows" then
     libRequire("osext", "win32/init")
 end
 
-if Utils.containsValue({ "Linux", "OSX", "BSD", "POSIX" }, ffi.os) then
+if Utils.containsValue({ "Linux", "OSX" }, ffi.os) then
     libRequire("osext", "unix/init")
 end
 

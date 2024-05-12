@@ -15,6 +15,5 @@ end
 libRequire("osext", "unix/error")
 libRequire("osext", "unix/user")
 libRequire("osext", "unix/host")
-libRequire("osext", "unix/fs")
 libRequire("osext", "unix/ps")
 libRequire("osext", "unix/osver")
