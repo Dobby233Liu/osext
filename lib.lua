@@ -18,8 +18,21 @@ if ffi.os == "Windows" then
     libRequire("osext", "win32/init")
 end
 
-return {
-    unload = function()
-        _G.OSExt = nil
+if Utils.containsValue({ "Linux", "OSX", "BSD", "POSIX" }, ffi.os) then
+    libRequire("osext", "unix/init")
+end
+
+
+local kristalEvents = {}
+
+function kristalEvents:preInit()
+    if OSExt.Unix then
+        OSExt.Unix:init()
     end
-}
+end
+
+function kristalEvents:unload()
+    _G.OSExt = nil
+end
+
+return kristalEvents
