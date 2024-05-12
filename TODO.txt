@@ -1,10 +1,5 @@
-Platform-independent functions for common stuff
-    - current process names
-    - username
-etc.
-
 Win32:
     - Spicer parts of process operations maybe
 
 Unix:
-    - osver
+    - osver, proc on OSX

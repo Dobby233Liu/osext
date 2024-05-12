@@ -198,11 +198,11 @@ ffi.cdef[[
 
 -- Gets the name of the computer that is running the game,
 -- in a specific format if needed
----@param nameFormat OSExt.Win32.ComputerNameFormat # defaults to netBIOS
+---@param nameFormat? OSExt.Win32.ComputerNameFormat # defaults to netBIOS
 function OSExt.Win32.getComputerName(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.ComputerNameFormat.netBIOS
 
-    local len = 15
+    local len = 256
     local buf = ffi.new("WCHAR[?]", len+1)
     local lenBuf = ffi.new("DWORD[1]", len+1) -- seriously
     local ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
