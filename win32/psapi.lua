@@ -54,6 +54,7 @@ ffi.cdef[[
     DWORD K32GetModuleBaseNameW(HANDLE hProcess, HMODULE hModule, LPWSTR lpBaseName, DWORD nSize);
 ]]
 
+-- For obtaining the full path to a process' image file.
 ---@param process OSExt.Win32.HANDLE # process handle
 ---@return string imageName # how the kernel sees it at least (TODO)
 function OSExt.Win32.getProcessImageFileName(process)
@@ -71,6 +72,7 @@ function OSExt.Win32.getProcessImageFileName(process)
     return OSExt.Win32.wideToLuaString(buf, len)
 end
 
+-- For obtaining the base name of one of a process' modules.
 ---@param process OSExt.Win32.HANDLE # process handle
 ---@param module OSExt.Win32.HMODULE # module handle
 ---@return string imageName

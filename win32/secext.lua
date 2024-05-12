@@ -68,7 +68,7 @@ end
 --
 -- Use OSExt.Win32.getComputerName instead
 ---@param nameFormat OSExt.Win32.ExtendedNameFormat # defaults to samCompatible
-function OSExt.Win32.getComputerObjectNameEx(nameFormat)
+function OSExt.Win32.getComputerNameEx(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.ExtendedNameFormat.samCompatible
 
     local len = 15
