@@ -1,5 +1,6 @@
 Win32:
     - Spicer parts of process operations maybe
+    - General status code dataclass
 
 Unix:
     - osver, proc on OSX
