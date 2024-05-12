@@ -30,7 +30,7 @@ OSExt.Win32.ToolHelp.SnapshotContents.all = bit.bor(
 
 
 ffi.cdef[[
-    HANDLE CreateToolHelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
+    HANDLE CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
 ]]
 
 -- Takes a snapshot of the specified processes, as well as the heaps, modules, and threads used by these processes.
@@ -41,7 +41,7 @@ ffi.cdef[[
 function OSExt.Win32.ToolHelp.createSnapshot(contents, pid)
     pid = pid or 0
 
-    local ret = OSExt.Win32.markHandleForGC(OSExt.Win32.Libs.tlhelp32.CreateToolHelp32Snapshot(contents, pid))
+    local ret = OSExt.Win32.markHandleForGC(OSExt.Win32.Libs.tlhelp32.CreateToolhelp32Snapshot(contents, pid))
     if ret == OSExt.Win32.INVALID_HANDLE_VALUE then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         -- TODO: ERROR_PARTIAL_COPY
@@ -284,7 +284,7 @@ end
 
 
 ffi.cdef[[
-    BOOL ToolHelp32ReadProcessMemory(
+    BOOL Toolhelp32ReadProcessMemory(
         DWORD       th32ProcessID,
         ULONG_PTR   lpBaseAddress, // FIXME: this is supposed to be a LPCVOID
         LPVOID      lpBuffer,
@@ -300,7 +300,7 @@ ffi.cdef[[
 function OSExt.Win32.ToolHelp.readProcessMemory(pid, address, size)
     local buffer = ffi.new("char[?]", size)
     local lenBuf = ffi.new("SIZE_T[1]", size)
-    local result = OSExt.Win32.Libs.tlhelp32.ToolHelp32ReadProcessMemory(pid, address, buffer, size, lenBuf)
+    local result = OSExt.Win32.Libs.tlhelp32.Toolhelp32ReadProcessMemory(pid, address, buffer, size, lenBuf)
     if not result then
         OSExt.Win32.raiseLastError()
     end
