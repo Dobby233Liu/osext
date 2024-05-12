@@ -19,7 +19,7 @@ OSExt.Win32.ProcessAccessRights = Utils.merge(OSExt.Win32.AccessRights, {
     vmRead = 0x0010,
     vmWrite = 0x0020
 })
-OSExt.Win32.ProcessAccessRights.allRights = bit.bor(
+OSExt.Win32.ProcessAccessRights.allAccess = bit.bor(
     OSExt.Win32.ProcessAccessRights.standardRightsRequired,
     OSExt.Win32.ProcessAccessRights.synchronize,
     0xFFFF
