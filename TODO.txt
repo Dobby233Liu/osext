@@ -4,7 +4,6 @@ Platform-independent functions for common stuff
 etc.
 
 Win32:
-    - PSApi
-    - Toolhelp
+    - Spicer parts of process operations maybe
 
 Unix: Everything

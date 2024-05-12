@@ -41,7 +41,7 @@ ffi.cdef[[
 function OSExt.Win32.ToolHelp.createSnapshot(contents, pid)
     pid = pid or 0
 
-    local ret = OSExt.Win32.makeHandle(OSExt.Win32.Libs.tlhelp32.CreateToolHelp32Snapshot(contents, pid))
+    local ret = OSExt.Win32.markHandleForGC(OSExt.Win32.Libs.tlhelp32.CreateToolHelp32Snapshot(contents, pid))
     if ret == OSExt.Win32.INVALID_HANDLE_VALUE then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         -- TODO: ERROR_PARTIAL_COPY
@@ -302,8 +302,7 @@ function OSExt.Win32.ToolHelp.readProcessMemory(pid, address, size)
     local lenBuf = ffi.new("SIZE_T[1]", size)
     local result = OSExt.Win32.Libs.tlhelp32.ToolHelp32ReadProcessMemory(pid, address, buffer, size, lenBuf)
     if not result then
-        local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        OSExt.Win32.raiseLuaError(e)
+        OSExt.Win32.raiseLastError()
     end
     return buffer, lenBuf[0]
 end

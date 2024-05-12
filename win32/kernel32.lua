@@ -14,7 +14,7 @@ ffi.cdef[[
 -- Makes a handle cdata that is automatically GC'd
 ---@param handle ffi.cdata*
 ---@return OSExt.Win32.HANDLE
-function OSExt.Win32.makeHandle(handle)
+function OSExt.Win32.markHandleForGC(handle)
     handle = ffi.cast(OSExt.Win32.HANDLE, handle)
     if handle == OSExt.Win32.INVALID_HANDLE_VALUE then return handle end
     return ffi.gc(handle, OSExt.Win32.Libs.kernel32.CloseHandle)
@@ -215,3 +215,18 @@ function OSExt.Win32.getComputerName(nameFormat)
     end
     return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end
+
+
+OSExt.Win32.AccessRights = {
+    delete = 0x00010000,
+    readControl = 0x00020000,
+    writeDAC = 0x00040000,
+    writeOwner = 0x00080000,
+    synchronize = 0x00100000
+}
+OSExt.Win32.AccessRights.standardRightsRequired = bit.bor(
+    OSExt.Win32.AccessRights.delete,
+    OSExt.Win32.AccessRights.readControl,
+    OSExt.Win32.AccessRights.writeDAC,
+    OSExt.Win32.AccessRights.writeOwner
+)
