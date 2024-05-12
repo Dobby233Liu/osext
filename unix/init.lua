@@ -15,5 +15,7 @@ end
 libRequire("osext", "unix/error")
 libRequire("osext", "unix/user")
 libRequire("osext", "unix/host")
-libRequire("osext", "unix/ps")
-libRequire("osext", "unix/osver")
+if ffi.os == "Linux" then
+    libRequire("osext", "unix/proc_linux")
+    libRequire("osext", "unix/osver_linux")
+end
