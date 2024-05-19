@@ -24,9 +24,23 @@ if Utils.containsValue({ "Linux", "OSX" }, ffi.os) then
 end
 
 
--- Gets the name of the user playing the game
+-- Gets the name of the user playing the game.
+--
+-- This prefers a specified name in the environment variables,
+-- and only obtains the name from the system database if there's none,
+-- similar to Python's getpass.getuser.
+--
+-- On Win32, the result most likely will not contain the domain name.
+-- If you are interested in that, use
+-- OSExt.Win32.getUserNameEx(ExtendedNameFormat.samCompatible).
 ---@return string?
 function OSExt.getUserName()
+    for _,var in ipairs({"LOGNAME", "USER", "LNAME", "USERNAME"}) do
+        local name = os.getenv(var)
+        if name then
+            return name
+        end
+    end
     if OSExt.Win32 then
         return OSExt.Win32.getUserName()
     elseif OSExt.Unix then

@@ -12,9 +12,8 @@ ffi.cdef[[
     BOOL GetUserNameW(LPWSTR lpBuffer, LPDWORD pcbBuffer);
 ]]
 
--- Gets the name of the user that is running the game \
--- Inferior to OSExt.Win32.getUserNameEx, but can return
--- the actual username
+-- Gets the name of the user that is running the game,
+-- excluding the domain name.
 function OSExt.Win32.getUserName()
     local len = 1024
     local buf = ffi.new("WCHAR[?]", len+1)

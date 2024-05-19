@@ -28,7 +28,7 @@ OSExt.Win32.ExtendedNameFormat = {
     userPrincipal = 8,
     servicePrincipal = 10,
 
-    -- DN stands for uhh domain name IDK what you were thinking about
+    -- DN stands for uhh distinguished name IDK what you were thinking about
     fullyQualifiedDN = 1,
     dnsDomain = 12,
 }
@@ -68,7 +68,7 @@ end
 --
 -- Use OSExt.Win32.getComputerName instead
 ---@param nameFormat OSExt.Win32.ExtendedNameFormat # defaults to samCompatible
-function OSExt.Win32.getComputerNameEx(nameFormat)
+function OSExt.Win32.getComputerObjectName(nameFormat)
     nameFormat = nameFormat or OSExt.Win32.ExtendedNameFormat.samCompatible
 
     local len = 15
