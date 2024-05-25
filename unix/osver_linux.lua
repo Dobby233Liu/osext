@@ -1,7 +1,7 @@
 local ffi = require "ffi"
 local fs = OSExt.Unix.fs
 
--- TODO: lsb-release
+-- TODO: lsb-release, as a fallback only
 
 OSExt.Unix.LinuxOSVer = {}
 
