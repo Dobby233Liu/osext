@@ -39,7 +39,7 @@ end
 function OSExt.getUserName()
     for _,var in ipairs({"LOGNAME", "USER", "LNAME", "USERNAME"}) do
         local name = os.getenv(var)
-        if name then
+        if name and name ~= "" then
             return name
         end
     end

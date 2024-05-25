@@ -96,5 +96,14 @@ end
 function OSExt.Unix.parseGecosOfUser(uid)
     local passwd = OSExt.Unix.getUserPasswd(uid)
     if not passwd.pw_gecos then return nil end
-    return OSExt.Unix.parseGecos(ffi.string(passwd.pw_gecos))
+    local ret = OSExt.Unix.parseGecos(ffi.string(passwd.pw_gecos))
+    -- Git: "Also & stands for capitalized form of the login name."
+    if ret and ret.fullName == "&" then
+        local username = passwd.pw_name
+        ret.fullName = Utils.sub(username, 1, 1):upper() .. Utils.sub(username, 2, 1)
+    end
+    return ret
 end
+
+-- For reference there's this email acquiring method in Git
+-- https://github.com/git/git/blob/b9cfe4845cb2562584837bc0101c0ab76490a239/ident.c#L171
