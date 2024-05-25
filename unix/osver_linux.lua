@@ -29,12 +29,12 @@ function OSExt.Unix.LinuxOSVer.getKernelVersion()
     local ret = ffi.C.uname(struc)
     if ret ~= 0 then OSExt.Unix.raiseLastError() end
     return {
-        sysname = ffi.string(struc.sysname),
-        nodename = ffi.string(struc.nodename),
+        systemName = ffi.string(struc.sysname),
+        nodeName = ffi.string(struc.nodename),
         release = ffi.string(struc.release),
         version = ffi.string(struc.version),
         machine = ffi.string(struc.machine),
-        domainname = ffi.string(struc.domainname)
+        domainName = ffi.string(struc.domainname)
     }
 end
 
