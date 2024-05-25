@@ -15,6 +15,7 @@ ffi.cdef[[
 function OSExt.Unix.getHostName()
     print(1)
     local buf = ffi.new("char[?]", OSExt.Unix.MAX_HOSTNAME)
+    ffi.fill(buf, OSExt.Unix.MAX_HOSTNAME, 0)
     print(1)
     local ok = ffi.C.gethostname(name, OSExt.Unix.MAX_HOSTNAME)
     print(1)
@@ -27,6 +28,7 @@ end
 ---@return string domainName
 function OSExt.Unix.getDomainName()
     local buf = ffi.new("char[?]", OSExt.Unix.MAX_DOMAINNAME)
+    ffi.fill(buf, OSExt.Unix.MAX_DOMAINNAME, 0)
     local ok = ffi.C.getdomainname(name, OSExt.Unix.MAX_DOMAINNAME)
     if ok ~= 0 then OSExt.Unix.raiseLastError() end
     return ffi.string(buf)
