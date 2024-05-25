@@ -30,7 +30,9 @@ function OSExt.Unix.getProcessExePath(pid)
 end
 -- Gets the name of the executable of the process corresponding to the given PID.
 function OSExt.Unix.getProcessExeName(pid)
-    local name, _ = string.gsub(OSExt.Unix.getProcessExePath(pid), ".*/(.*)", "%1")
+    local path = OSExt.Unix.getProcessExePath(pid)
+    if not path then return nil end
+    local name, _ = string.gsub(path, ".*/(.*)", "%1")
     return name
 end
 
