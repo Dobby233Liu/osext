@@ -19,5 +19,5 @@ libRequire("osext", "unix/user")
 libRequire("osext", "unix/host")
 if ffi.os == "Linux" then
     libRequire("osext", "unix/proc_linux")
-    libRequire("osext", "unix/osver_linux")
 end
+libRequire("osext", "unix/osver")

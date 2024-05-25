@@ -5,16 +5,6 @@ local fs = OSExt.Unix.fs
 
 OSExt.Unix.LinuxOSVer = {}
 
--- Returns the content of /proc/version.
-function OSExt.Unix.LinuxOSVer.getKernelVersion()
-    local versionFile = fs.open("/proc/version", "r")
-    local versionStrBuf, versionStrLen = versionFile:readall()
-    local versionStr = ffi.string(versionStrBuf, versionStrLen)
-    versionFile:close()
-    return versionStr
-end
-
-
 local function parseBshKV(str)
     local ret = {}
     for _,line in ipairs(Utils.split(str, "\n")) do
