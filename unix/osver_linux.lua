@@ -57,7 +57,7 @@ function OSExt.Unix.LinuxOSVer.getOSReleaseData()
         local osReleaseStrBuf, osReleaseStrLen = osReleaseFile:readall()
         print(osReleaseStrBuf, osReleaseStrLen)
         local ret = ffi.string(osReleaseStrBuf, osReleaseStrLen)
-        print(2)
+        print(ret)
         osReleaseFile:close()
         print(2)
         return ret
