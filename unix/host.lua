@@ -13,9 +13,13 @@ ffi.cdef[[
 -- Gets the hostname of the machine.
 ---@return string hostName
 function OSExt.Unix.getHostName()
+    print(1)
     local buf = ffi.new("char[?]", OSExt.Unix.MAX_HOSTNAME)
+    print(1)
     local ok = ffi.C.gethostname(name, OSExt.Unix.MAX_HOSTNAME)
+    print(1)
     if ok ~= 0 then OSExt.Unix.raiseLastError() end
+    print(1)
     return ffi.string(buf)
 end
 
