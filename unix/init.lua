@@ -12,6 +12,8 @@ function OSExt.Unix.init()
     end
 end
 
+OSExt.Unix.fs = libRequire("osext", "fslib/fs")
+
 libRequire("osext", "unix/error")
 libRequire("osext", "unix/user")
 libRequire("osext", "unix/host")

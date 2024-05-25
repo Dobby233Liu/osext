@@ -1,5 +1,5 @@
 local ffi = require "ffi"
-local fs = libRequire("osext", "fslib/fs")
+local fs = OSExt.Unix.fs
 
 ---@alias OSExt.Unix.pid integer
 
