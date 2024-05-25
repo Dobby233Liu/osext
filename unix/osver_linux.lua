@@ -41,9 +41,7 @@ end
 local function parseBshKV(str)
     local ret = {}
     for _,line in ipairs(Utils.split(str, "\n")) do
-        print("parse", line)
         local k, v = line:match('^([A-Z0-9_]+)="?(.-)"?$')
-        print(k, v)
         if k and v then ret[k] = v end
     end
     return ret
@@ -53,20 +51,13 @@ end
 function OSExt.Unix.LinuxOSVer.getOSReleaseData()
     local function tryLoading(file)
         if not fs.is(file) then return nil end
-        print(2)
         local osReleaseFile = fs.open(file, "r")
-        print(2)
         local osReleaseStrBuf, osReleaseStrLen = osReleaseFile:readall()
-        print(osReleaseStrBuf, osReleaseStrLen)
         local ret = ffi.string(osReleaseStrBuf, osReleaseStrLen)
-        print(ret)
         osReleaseFile:close()
-        print(ret)
         return ret
     end
     local osReleaseStr = tryLoading("/etc/os-release")
-    print(1)
-    if not osReleaseStr then osReleaseStr = tryLoading("/usr/lib/os-release")
-        print(1) end
+    if not osReleaseStr then osReleaseStr = tryLoading("/usr/lib/os-release") end
     return parseBshKV(osReleaseStr)
 end
