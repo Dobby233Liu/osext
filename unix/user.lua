@@ -63,7 +63,7 @@ end
 ---@return string name
 function OSExt.Unix.getUserName(uid)
     local passwd = OSExt.Unix.getUserPasswd(uid)
-    return passwd.pw_name
+    return ffi.string(passwd.pw_name)
 end
 
 
@@ -95,5 +95,5 @@ end
 function OSExt.Unix.parseGecosOfUser(uid)
     local passwd = OSExt.Unix.getUserPasswd(uid)
     if not passwd.pw_gecos then return nil end
-    return OSExt.Unix.parseGecos(passwd.pw_gecos)
+    return OSExt.Unix.parseGecos(ffi.string(passwd.pw_gecos))
 end
