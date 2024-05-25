@@ -596,7 +596,9 @@ Read Arvid Norberg's article[1] for more info.
 ]=]
 
 local ffi = require'ffi'
-setfenv(1, libRequire('osext', 'fslib.fs_common'))
+local ts = libRequire('osext', 'fslib.fs_common')
+print(Utils.dump(ts))
+setfenv(1, ts)
 
 if win then
 	libRequire('osext', 'fslib.fs_win')
