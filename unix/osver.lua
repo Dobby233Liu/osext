@@ -8,17 +8,17 @@ if not OSExt._typeExists("utsname_raw") then
     ffi.cdef[[
         // 5 entries x 65
         // not certain about the GNU extension
-        typedef char[325] utsname_raw;
+        typedef char utsname_raw;
     ]]
 end
 
 ffi.cdef[[
-    int uname(utsname_raw *buf);
+    int uname(utsname_raw[325] *buf);
 ]]
 
 function OSExt.Unix.getKernelVersion()
     -- this one is a gamble
-    local uname_raw = ffi.new("utsname_raw")
+    local uname_raw = ffi.new("utsname_raw[325]")
     local ok = ffi.C.uname(uname_raw)
     if ok ~= 0 then OSExt.Unix.raiseLastError() end
     local keys = {"sysname", "nodename", "release", "version", "machine" --[[, "domainname" ]]}
