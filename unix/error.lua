@@ -34,9 +34,9 @@ function OSExt.Unix.raiseLuaError(errno, format)
     if errno ~= 0 then
         local message = ""
         if format then
-            message = OSExt.Unix.getSystemMessage(w32Error) .. " "
+            message = OSExt.Unix.getSystemMessage(errno) .. " "
         end
-        error(string.format("Unix library operation failed with error: %s(0x%08x)", message, w32Error))
+        error(string.format("Unix library operation failed with error: %s(0x%08x)", message, errno))
     end
 end
 
