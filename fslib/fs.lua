@@ -596,12 +596,13 @@ Read Arvid Norberg's article[1] for more info.
 ]=]
 
 local ffi = require'ffi'
-setfenv(1, libRequire('osext', 'fslib.fs_common'))
+local env = libRequire('osext', 'fslib.fs_common')
+setfenv(1, env)
 
 if win then
-	libRequire('osext', 'fslib.fs_win')
+	libRequire('osext', 'fslib.fs_win', env)
 elseif linux or osx then
-	libRequire('osext', 'fslib.fs_posix')
+	libRequire('osext', 'fslib.fs_posix', env)
 else
 	error'platform not Windows, Linux or OSX'
 end
