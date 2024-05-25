@@ -4,3 +4,4 @@ Win32:
 
 Unix:
     - osver, proc on OSX
+    - thread safety

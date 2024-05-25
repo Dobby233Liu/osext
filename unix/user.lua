@@ -52,6 +52,7 @@ ffi.cdef[[
 ---@return OSExt.Unix.passwd passwd
 function OSExt.Unix.getUserPasswd(uid)
     if uid == nil then uid = OSExt.Unix.getUserId() end
+    -- FIXME: thread-unsafe
     local ret = ffi.C.getpwuid(uid)
     if not ret then OSExt.Unix.raiseLastError() end
     return ret

@@ -1,5 +1,3 @@
-local ffi = require "ffi"
-
 -- Unix interfaces
 OSExt.Unix = {}
 
@@ -17,7 +15,5 @@ OSExt.Unix.fs = libRequire("osext", "fslib/fs")
 libRequire("osext", "unix/error")
 libRequire("osext", "unix/user")
 libRequire("osext", "unix/host")
-if ffi.os == "Linux" then
-    libRequire("osext", "unix/proc_linux")
-end
+libRequire("osext", "unix/proc")
 libRequire("osext", "unix/osver")

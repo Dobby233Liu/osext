@@ -19,7 +19,9 @@ if ffi.os == "Windows" then
 end
 
 assert(ffi.os ~= "OSX", "macOS not properly supported yet")
-if Utils.containsValue({ "Linux", "OSX" }, ffi.os) then
+assert(ffi.os ~= "POSIX")
+-- FIXME: what about fslib?
+if Utils.containsValue({ "Linux", "OSX", "BSD" }, ffi.os) then
     libRequire("osext", "unix/init")
 end
 
