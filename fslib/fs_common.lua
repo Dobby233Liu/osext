@@ -5,7 +5,7 @@
 local ffi = require'ffi'
 local bit = require'bit'
 local glue = libRequire('osext', 'fslib.glue')
-local path = require'path'
+local path = libRequire('osext', 'fslib.path')
 
 local min, max, floor, ceil, ln =
 	math.min, math.max, math.floor, math.ceil, math.log
