@@ -51,13 +51,20 @@ end
 function OSExt.Unix.LinuxOSVer.getOSReleaseData()
     local function tryLoading(file)
         if not fs.is(file) then return nil end
+        print(2)
         local osReleaseFile = fs.open(file, "r")
+        print(2)
         local osReleaseStrBuf, osReleaseStrLen = osReleaseFile:readall()
+        print(2)
         local ret = ffi.string(osReleaseStrBuf, osReleaseStrLen)
+        print(2)
         osReleaseFile:close()
+        print(2)
         return ret
     end
     local osReleaseStr = tryLoading("/etc/os-release")
-    if not osReleaseStr then osReleaseStr = tryLoading("/usr/lib/os-release") end
+    print(1)
+    if not osReleaseStr then osReleaseStr = tryLoading("/usr/lib/os-release")
+        print(1) end
     return parseBshKV(osReleaseStr)
 end
