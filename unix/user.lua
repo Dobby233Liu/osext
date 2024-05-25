@@ -44,7 +44,7 @@ end
 ---@field pw_shell string
 
 ffi.cdef[[
-    struct passwd *getpwuid(uid_t uid);
+    passwd *getpwuid(uid_t uid);
 ]]
 
 -- Gets the passwd entry for the user with the given UID
