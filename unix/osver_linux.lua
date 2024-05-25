@@ -42,7 +42,7 @@ local function parseBshKV(str)
     local ret = {}
     for _,line in ipairs(Utils.split(str, "\n")) do
         print("parse", line)
-        local k, v = line:match('^(%w+)=(?:"?)(.+?)(?:"?)$')
+        local k, v = line:match('^([A-Z0-9_])="?(.-)"?$')
         print(k, v)
         if k and v then ret[k] = v end
     end
