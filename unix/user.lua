@@ -23,7 +23,7 @@ end
 
 if not OSExt._typeExists("passwd") then
     ffi.cdef[[
-        struct _passwd {
+        typedef struct _passwd {
             char    *pw_name;
             char    *pw_passwd;
             uid_t   pw_uid;
