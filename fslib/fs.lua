@@ -597,7 +597,31 @@ Read Arvid Norberg's article[1] for more info.
 
 local ffi = require'ffi'
 local ts = libRequire('osext', 'fslib.fs_common')
-print(Utils.dump(ts))
+function FUCK(o)
+    if type(o) == 'table' then
+        local s = '{'
+        local cn = 1
+        if Utils.isArray(o) then
+            for _,v in ipairs(o) do
+                if cn > 1 then s = s .. ', ' end
+                s = s .. FUCK(v)
+                cn = cn + 1
+            end
+        else
+            for k,v in pairs(o) do
+                if cn > 1 then s = s .. ', ' end
+                s = s .. dumpKey(k) .. ' = ' .. FUCK(v)
+                cn = cn + 1
+            end
+        end
+        return s .. '}'
+    elseif type(o) == 'string' then
+        return '"' .. o .. '"'
+    else
+        return tostring(o)
+    end
+end
+print(FUCK(ts))
 setfenv(1, ts)
 
 if win then
