@@ -595,15 +595,15 @@ Read Arvid Norberg's article[1] for more info.
 
 ]=]
 
-if not ... then require'fs_test'; return end
+if not ... then libRequire('osext', 'fslib.fs_test'); return end
 
 local ffi = require'ffi'
-setfenv(1, require'fs_common')
+setfenv(1, libRequire('osext', 'fslib.fs_common'))
 
 if win then
-	require'fs_win'
+	libRequire('osext', 'fslib.fs_win')
 elseif linux or osx then
-	require'fs_posix'
+	libRequire('osext', 'fslib.fs_posix')
 else
 	error'platform not Windows, Linux or OSX'
 end

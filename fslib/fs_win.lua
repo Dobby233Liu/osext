@@ -2,12 +2,12 @@
 --portable filesystem API for LuaJIT / Windows backend
 --Written by Cosmin Apreutesei. Public Domain.
 
-if not ... then require'fs_test'; return end
+if not ... then libRequire('osext', 'fslib.fs_test'); return end
 
 local ffi = require'ffi'
 local bit = require'bit'
 local bor, band, shl = bit.bor, bit.band, bit.lshift
-setfenv(1, require'fs_common')
+setfenv(1, libRequire('osext', 'fslib.fs_common'))
 
 local C = ffi.C
 
