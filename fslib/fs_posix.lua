@@ -2,8 +2,6 @@
 --portable filesystem API for LuaJIT / Linux & OSX backend
 --Written by Cosmin Apreutesei. Public Domain.
 
-if not ... then libRequire('osext', 'fslib.fs_test'); return end
-
 local ffi = require'ffi'
 local bit = require'bit'
 local bor, band, bnot, shl = bit.bor, bit.band, bit.bnot, bit.lshift

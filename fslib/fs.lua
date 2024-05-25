@@ -595,8 +595,6 @@ Read Arvid Norberg's article[1] for more info.
 
 ]=]
 
-if not ... then libRequire('osext', 'fslib.fs_test'); return end
-
 local ffi = require'ffi'
 setfenv(1, libRequire('osext', 'fslib.fs_common'))
 

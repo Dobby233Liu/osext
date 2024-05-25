@@ -2,8 +2,6 @@
 --portable filesystem API for LuaJIT / common code
 --Written by Cosmin Apreutesei. Public Domain.
 
-if not ... then libRequire('osext', 'fslib.fs_test'); return end
-
 local ffi = require'ffi'
 local bit = require'bit'
 local glue = require'glue'
