@@ -5,7 +5,7 @@
 local ffi = require'ffi'
 local bit = require'bit'
 local bor, band, shl = bit.bor, bit.band, bit.lshift
-setfenv(1, libRequire('osext', 'fslib.fs_common'))
+--setfenv(1, libRequire('osext', 'fslib.fs_common'))
 
 local C = ffi.C
 

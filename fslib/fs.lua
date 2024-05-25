@@ -596,42 +596,7 @@ Read Arvid Norberg's article[1] for more info.
 ]=]
 
 local ffi = require'ffi'
-local ts = libRequire('osext', 'fslib.fs_common')
-local function dumpKey(key)
-    if type(key) == 'table' then
-        return '('..tostring(key)..')'
-    elseif type(key) == 'string' and (not key:find("[^%w_]") and not tonumber(key:sub(1,1)) and key ~= "") then
-        return key
-    else
-        return '['..Utils.dump(key)..']'
-    end
-end
-function FUCK(o)
-    if type(o) == 'table' then
-        local s = '{'
-        local cn = 1
-        if Utils.isArray(o) then
-            for _,v in ipairs(o) do
-                if cn > 1 then s = s .. ', ' end
-                s = s .. FUCK(v)
-                cn = cn + 1
-            end
-        else
-            for k,v in pairs(o) do
-                if cn > 1 then s = s .. ', ' end
-                s = s .. dumpKey(k) .. ' = ' .. FUCK(v)
-                cn = cn + 1
-            end
-        end
-        return s .. '}'
-    elseif type(o) == 'string' then
-        return '"' .. o .. '"'
-    else
-        return tostring(o)
-    end
-end
-print(FUCK(ts))
-setfenv(1, ts)
+setfenv(1, libRequire('osext', 'fslib.fs_common'))
 
 if win then
 	libRequire('osext', 'fslib.fs_win')
