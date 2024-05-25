@@ -13,7 +13,7 @@ if not OSExt._typeExists("utsname_raw") then
 end
 
 ffi.cdef[[
-    int uname(utsname_raw[325] *buf);
+    int uname(utsname_raw *buf);
 ]]
 
 function OSExt.Unix.getKernelVersion()
