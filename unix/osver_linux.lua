@@ -41,7 +41,9 @@ end
 local function parseBshKV(str)
     local ret = {}
     for _,line in ipairs(Utils.split(str, "\n")) do
+        print("parse", line)
         local k, v = line:match('^(%w+)=(?:"?)(.+?)(?:"?)$')
+        print(k, v)
         if k and v then ret[k] = v end
     end
     return ret
@@ -59,7 +61,7 @@ function OSExt.Unix.LinuxOSVer.getOSReleaseData()
         local ret = ffi.string(osReleaseStrBuf, osReleaseStrLen)
         print(ret)
         osReleaseFile:close()
-        print(2)
+        print(ret)
         return ret
     end
     local osReleaseStr = tryLoading("/etc/os-release")
