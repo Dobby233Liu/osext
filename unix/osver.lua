@@ -4,32 +4,30 @@ if ffi.os == "Linux" then
     libRequire("osext", "unix/osver_linux")
 end
 
-if not OSExt._typeExists("struct utsname") then
+if not OSExt._typeExists("utsname_raw") then
     ffi.cdef[[
-        struct utsname {
-            char *sysname;
-            char *nodename;
-            char *release;
-            char *version;
-            char *machine;
-            char *domainname; /* GNU extension */
-        };
+        // 5 entries x 65
+        // not certain about the GNU extension
+        typedef char[325] utsname_raw;
     ]]
 end
 
 ffi.cdef[[
-    int uname(struct utsname *buf);
+    int uname(utsname_raw *buf);
 ]]
 
 function OSExt.Unix.getKernelVersion()
-    local uname = ffi.new("struct utsname")
-    local ok = ffi.C.uname(uname)
+    -- this one is a gamble
+    local uname_raw = ffi.new("utsname_raw")
+    local ok = ffi.C.uname(uname_raw)
     if ok ~= 0 then OSExt.Unix.raiseLastError() end
+    local keys = {"sysname", "nodename", "release", "version", "machine" --[[, "domainname" ]]}
     local ret = {}
-    for _,key in ipairs({"sysname", "nodename", "release", "version", "machine", "domainname"}) do
-        if uname[key] then
-            ret[key] = ffi.string(uname[key])
-        end
+    local pos = 0
+    for _,key in ipairs(keys) do
+        local str_here = ffi.string(uname_raw + pos)
+        ret[key] = str_here
+        pos = pos + #str_here + 1
     end
     return ret
 end
