@@ -1,5 +1,5 @@
 local ffi = require'ffi'
-local fs = require'fs'
+local fs = libRequire('osext', 'fslib.fs')
 local pp = require'pp'
 local time = require'time'
 local win = ffi.abi'win'
