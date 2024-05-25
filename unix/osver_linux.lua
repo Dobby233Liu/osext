@@ -9,8 +9,8 @@ OSExt.Unix.LinuxOSVer = {}
 function OSExt.Unix.LinuxOSVer.getKernelVersion()
     local versionFile = fs.open("/proc/version", "r")
     local versionStrBuf, versionStrLen = versionFile:readall()
-    versionFile:close()
     local versionStr = ffi.string(versionStrBuf, versionStrLen)
+    versionFile:close()
     return versionStr
 end
 
@@ -30,8 +30,9 @@ function OSExt.Unix.LinuxOSVer.getOSReleaseData()
         if not fs.is(file) then return nil end
         local osReleaseFile = fs.open(file, "r")
         local osReleaseStrBuf, osReleaseStrLen = osReleaseFile:readall()
+        local ret = ffi.string(osReleaseStrBuf, osReleaseStrLen)
         osReleaseFile:close()
-        return ffi.string(osReleaseStrBuf, osReleaseStrLen)
+        return ret
     end
     local osReleaseStr = tryLoading("/etc/os-release")
     if not osReleaseStr then osReleaseStr = tryLoading("/usr/lib/os-release") end
