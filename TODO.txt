@@ -1,6 +1,7 @@
 Win32:
     - Spicer parts of process operations maybe
     - General status code dataclass
+    - isElevated https://stackoverflow.com/questions/95912/how-can-i-detect-if-my-process-is-running-uac-elevated-or-not
 
 Unix:
     - osver, proc on OSX

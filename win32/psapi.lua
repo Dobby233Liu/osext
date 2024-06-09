@@ -25,6 +25,8 @@ OSExt.Win32.ProcessAccessRights.allAccess = bit.bor(
     0xFFFF
 )
 
+---@alias OSExt.Win32.HPROCESS OSExt.Win32.HANDLE # fantasy alias
+
 ffi.cdef[[
     HANDLE OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId);
 ]]
@@ -32,7 +34,7 @@ ffi.cdef[[
 -- Opens an existing local process object.
 ---@param processId integer # process id
 ---@param accessRights? integer # access rights, defaults to queryInformation
----@return OSExt.Win32.HANDLE handle
+---@return OSExt.Win32.HPROCESS handle
 function OSExt.Win32.openProcess(processId, accessRights)
     if accessRights == nil then
         accessRights = bit.bor(
@@ -56,7 +58,7 @@ ffi.cdef[[
 
 --[[
 -- For obtaining the full path to a process' image file in device form.
----@param process OSExt.Win32.HANDLE # process handle
+---@param process OSExt.Win32.HPROCESS # process handle
 ---@return string imageName
 function OSExt.Win32.getProcessImageFileNameNative(process)
     --process = OSExt.Win32.markHandleForGC(process)
@@ -76,7 +78,7 @@ end
 ]]
 
 -- For obtaining the base name of one of a process' modules.
----@param process OSExt.Win32.HANDLE # process handle
+---@param process OSExt.Win32.HPROCESS # process handle
 ---@param module OSExt.Win32.HMODULE # module handle
 ---@return string imageName
 function OSExt.Win32.getModuleBaseName(process, module)
@@ -100,7 +102,7 @@ ffi.cdef[[
     BOOL QueryFullProcessImageNameW(HANDLE hProcess, DWORD dwFlags, LPWSTR lpExeName, PDWORD lpdwSize);
 ]]
 -- For obtaining the full path to a process' image file in device form.
----@param process OSExt.Win32.HANDLE # process handle
+---@param process OSExt.Win32.HPROCESS # process handle
 ---@param nativeStyle boolean
 ---@return string imageName
 function OSExt.Win32.getProcessImageFileName(process, nativeStyle)

@@ -12,6 +12,8 @@ ffi.cdef[[
     BOOL GetUserNameW(LPWSTR lpBuffer, LPDWORD pcbBuffer);
 ]]
 
+-- TODO: allow pulling data from other users, by ImpersonateLoggedOnUser perhaps??
+
 -- Gets the name of the user that is running the game,
 -- excluding the domain name.
 function OSExt.Win32.getUserName()
