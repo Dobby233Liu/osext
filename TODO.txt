@@ -2,6 +2,7 @@ Win32:
     - Spicer parts of process operations maybe
     - General status code dataclass
     - isElevated https://stackoverflow.com/questions/95912/how-can-i-detect-if-my-process-is-running-uac-elevated-or-not
+    - For functions that take [in, out] length params we can retry on ERROR_MORE_DATA
 
 Unix:
     - osver, proc on OSX
