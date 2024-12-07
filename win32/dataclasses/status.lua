@@ -47,6 +47,16 @@ function OSExt.Win32.Status.fromWin32Error(w32Error)
     return status
 end
 
+function OSExt.Win32.Status.fromHResult(hResult)
+    local status = OSExt.Win32.Status()
+    status.customer = bit.band(hResult, 0x1) ~= 0
+    status.facility = bit.band(bit.rshift(hResult, 16), 0xfff)
+    status.facilityKind = bit.band(bit.rshift(hResult, 3), 0x1)
+    status.code = bit.band(hResult, 0x0000ffff)
+    status.severity = bit.band(bit.rshift(hResult, 0), 0x3)
+    return status
+end
+
 function OSExt.Win32.Status:_sanityCheck()
     assert(self.code >= 0 and self.code <= 0xffff)
 end
