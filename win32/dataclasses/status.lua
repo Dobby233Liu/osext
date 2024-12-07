@@ -1,7 +1,7 @@
 local bit = require"bit"
 
 ---@class OSExt.Win32.Status : Class
--- WIP
+-- Represents a Windows status code (Win32 error/HRESULT/NTSTATUS)
 --
 -- [MS-ERREF](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/1bc92ddf-b79e-413c-bbaa-99a5281a6c90)
 OSExt.Win32.Status = Class()
