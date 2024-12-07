@@ -90,6 +90,6 @@ OSExt.Win32.NtStatusFacilities = {
 libRequire("osext", "win32/ntdll")
 libRequire("osext", "win32/kernel32")
 libRequire("osext", "win32/advapi32")
-libRequire("osext", "win32/secext")
+libRequire("osext", "win32/secur32")
 libRequire("osext", "win32/psapi")
 libRequire("osext", "win32/toolhelp32")

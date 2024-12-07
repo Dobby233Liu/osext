@@ -1,10 +1,10 @@
 local ffi = require "ffi"
 
--- Implements some secur32.dll interfaces that are covered by secext.h
+-- Implements some secur32.dll interfaces, some of which are covered by secext.h
 --
 -- This provides various functions to deal with user/computer object names
 --
--- [MSDN](https://learn.microsoft.com/en-us/windows/win32/api/secext/)
+-- [secext MSDN](https://learn.microsoft.com/en-us/windows/win32/api/secext/)
 
 OSExt.Win32.Libs.secur32 = ffi.load("secur32")
 if not OSExt.Win32.Libs.secur32 then
