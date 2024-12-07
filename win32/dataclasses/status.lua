@@ -42,7 +42,7 @@ function OSExt.Win32.Status.fromWin32Error(w32Error)
     if w32Error == OSExt.Win32.Win32Errors.ERROR_SUCCESS --[[ FIXME ]] then
         status.severity = OSExt.Win32.Status.SEVERITY.success
     else
-        status.severity = OSExt.Win32.Status.SEVERITY.error
+        status.severity = OSExt.Win32.Status.SEVERITY.warning
     end
     return status
 end
@@ -60,7 +60,7 @@ function OSExt.Win32.Status.fromNtStatus(ntStatus, _isHResult)
     if _isHResult and not bitN then
         status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.hResult
     end
-    status.facility = bit.band(bit.rshift(ntStatus, 16), 0xffff)
+    status.facility = bit.band(bit.rshift(ntStatus, 16), 0x0fff)
     status.code = bit.band(ntStatus, 0xffff)
     return status
 end
@@ -70,6 +70,10 @@ function OSExt.Win32.Status:_sanityCheck()
 end
 
 function OSExt.Win32.Status:toHResult()
+    return self:toNtStatus(true)
+end
+
+function OSExt.Win32.Status:toNtStatus(_isHResult)
     self:_sanityCheck()
 
     local code = 0
@@ -80,13 +84,12 @@ function OSExt.Win32.Status:toHResult()
         code = bit.bor(code, bit.lshift(value, bitWidth - index - 1))
     end
 
-    set(0, self.severity >= OSExt.Win32.Status.SEVERITY.error) -- S
-    -- R todo
+    print(code)
+    code = bit.bor(code, bit.lshift(bit.band(self.severity, 0x3), 30)) -- Sev
     set(2, self.customer) -- C
     set(3, self.facility_kind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus) -- N
-    set(4, false) -- X
     print(code)
-    code = bit.bor(code, bit.lshift(bit.band(self.facility, 0xfff), 16))
+    code = bit.bor(code, bit.lshift(bit.band(self.facility, 0x0fff), 16))
     print(code)
     code = bit.bor(code, bit.band(self.code, 0x0000ffff))
 
