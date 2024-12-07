@@ -88,6 +88,9 @@ OSExt.Win32.NtStatuses = {
 OSExt.Win32.NtStatusFacilities = {
     FACILITY_WIN32 = 7
 }
+require("lldebugger")
+lldebugger.start()
+lldebugger.requestBreak()
 libRequire("osext", "win32/dataclasses/status")
 
 libRequire("osext", "win32/ntdll")
