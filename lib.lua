@@ -102,6 +102,9 @@ function kristalEvents:preInit()
 end
 
 function kristalEvents:unload()
+    if OSExt.Unix then
+        OSExt.Unix:unload()
+    end
     _G.OSExt = nil
 end
 

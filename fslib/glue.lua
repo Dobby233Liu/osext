@@ -112,7 +112,7 @@ glue.empty = setmetatable({}, {
 
 --count the keys in a table with an optional upper limit.
 function glue.count(t, maxn)
-	local maxn = maxn or 1/0
+	local maxn = maxn or (1/0)
 	local n = 0
 	for _ in pairs(t) do
 		n = n + 1

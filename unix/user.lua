@@ -15,7 +15,7 @@ ffi.cdef[[
 
 -- For obtaining the real user ID of the current process (not the effective user ID)
 ---@return OSExt.Unix.uid uid
-function OSExt.Unix.getUserId()
+function OSExt.Unix.getRealUserId()
     -- can't fail
     return ffi.C.getuid()
 end
@@ -45,15 +45,29 @@ end
 
 ffi.cdef[[
     passwd *getpwuid(uid_t uid);
+    passwd *getpwnam(const char *name);
 ]]
 
--- Gets the passwd entry for the user with the given UID
+-- Gets the passwd entry for the user with the given UID.
+-- The result should NOT be freed.
 ---@param uid? OSExt.Unix.uid # defaults to the real UID
 ---@return OSExt.Unix.passwd passwd
 function OSExt.Unix.getUserPasswd(uid)
-    if uid == nil then uid = OSExt.Unix.getUserId() end
+    if uid == nil then uid = OSExt.Unix.getRealUserId() end
     -- FIXME: thread-unsafe
     local ret = ffi.C.getpwuid(uid)
+    if not ret then OSExt.Unix.raiseLastError() end
+    return ret
+end
+
+-- Gets the passwd entry for the user with the given name.
+-- The result should NOT be freed.
+---@param name string
+---@return OSExt.Unix.passwd passwd
+function OSExt.Unix.getUserPasswdByName(name)
+    assert(name) -- TODO
+    -- FIXME: thread-unsafe
+    local ret = ffi.C.getpwnam(name)
     if not ret then OSExt.Unix.raiseLastError() end
     return ret
 end
@@ -65,6 +79,14 @@ end
 function OSExt.Unix.getUserName(uid)
     local passwd = OSExt.Unix.getUserPasswd(uid)
     return ffi.string(passwd.pw_name)
+end
+
+-- Gets the UID of the user with the given username
+---@param name string
+---@return OSExt.Unix.uid uid
+function OSExt.Unix.getUserIdByName(name)
+    local passwd = OSExt.Unix.getUserPasswdByName(name)
+    return passwd.pw_uid
 end
 
 

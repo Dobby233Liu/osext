@@ -26,8 +26,23 @@ end
 
 -- Gets the path to the executable of the process corresponding to the given PID.
 function OSExt.Unix.getProcessExePath(pid)
-    return fs.readlink(OSExt.Unix.getProcessFs(pid).."/exe")
+    local procFs = OSExt.Unix.getProcessFs(pid)
+    -- Try to resolve the "exe" symlink - most reliable
+    local ret = fs.readlink(procFs.."/exe")
+
+    -- If that fails, try to read the "cmdline" file - less reliable
+    if not ret then
+        local cmdlineFile = fs.open(procFs.."/cmdline", "r")
+        local cmdlineStrBuf, cmdlineStrLen = cmdlineFile:readall()
+        local cmdline = ffi.string(cmdlineStrBuf, cmdlineStrLen)
+        if cmdline then
+            ret = Utils.split(cmdline, "\0")[1]
+        end
+    end
+
+    return ret
 end
+
 -- Gets the name of the executable of the process corresponding to the given PID.
 function OSExt.Unix.getProcessExeName(pid)
     local path = OSExt.Unix.getProcessExePath(pid)
@@ -41,7 +56,7 @@ end
 function OSExt.Unix.getProcesses()
     local pids = {}
     for name, d in fs.dir("/proc") do
-        if name and d:attr("type") == "dir" and tonumber(name) then
+        if name and d:is("dir") and tonumber(name) then
             table.insert(pids, tonumber(name))
         end
     end
