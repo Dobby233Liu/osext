@@ -57,6 +57,7 @@ function OSExt.Win32.Status:toHResult()
     local code = 0
     local bitWidth = 32
     local function set(index, value)
+        print(code)
         if value then value = 0x1 else value = 0 end
         code = bit.bor(code, bit.lshift(value, bitWidth - index - 1))
     end
@@ -66,7 +67,9 @@ function OSExt.Win32.Status:toHResult()
     set(2, self.customer) -- C
     set(3, self.facility_kind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus) -- N
     set(4, false) -- X
+    print(code)
     code = bit.bor(code, bit.lshift(bit.band(self.facility, 0xfff), 16))
+    print(code)
     code = bit.bor(code, bit.band(self.code, 0x0000ffff))
 
     return code
