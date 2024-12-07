@@ -50,7 +50,7 @@ end
 function OSExt.Win32.Status.fromHResult(hResult)
     local status = OSExt.Win32.Status()
     status.severity = bit.rshift(hResult, 31) == 0 and OSExt.Win32.Status.SEVERITY.success or OSExt.Win32.Status.SEVERITY.error
-    status.customer = bit.band(bit.rshift(hResult, 29), 0x1) == 0
+    status.customer = bit.band(bit.rshift(hResult, 29), 0x1) == 1
     status.facility = bit.band(bit.rshift(hResult, 16), 0xfff)
     status.facilityKind = bit.band(bit.rshift(hResult, 3), 0x1)
     status.code = bit.band(hResult, 0x0000ffff)
