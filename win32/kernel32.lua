@@ -111,7 +111,7 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         -- guard against stack overflow
         OSExt.Win32.raiseLuaError(e, not Utils.containsValue({
-            OSExt.Win32.HResults.ERROR_INVALID_PARAMETER
+            OSExt.Win32.Win32Errors.ERROR_INVALID_PARAMETER
         }, e))
     end
     return OSExt.Win32.wideToLuaString(buf, len)
@@ -146,7 +146,7 @@ end
 ---@param w32Error integer # the HRESULT
 ---@param format? boolean # whether to get a readable error message or not
 function OSExt.Win32.raiseLuaError(w32Error, format)
-    if w32Error ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+    if w32Error ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
         error(OSExt.Win32.makeErrorString(w32Error, format))
     end
 end
@@ -215,12 +215,12 @@ function OSExt.Win32.getComputerName(nameFormat)
     local ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+        if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             buf = ffi.new("WCHAR[?]", lenBuf[0])
             ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
-            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.HResults.ERROR_SUCCESS
+            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
         end
-        if e ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+        if e ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
             OSExt.Win32.raiseLuaError(e)
         end
     end

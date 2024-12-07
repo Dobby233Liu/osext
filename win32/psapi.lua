@@ -87,7 +87,7 @@ function OSExt.Win32.getModuleBaseName(process, module)
     local ret = OSExt.Win32.Libs.kernel32.K32GetModuleBaseNameW(process, module, buf, len)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+        if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             error("Internal error - buffer is too small, my fault")
         end
         OSExt.Win32.raiseLuaError(e)
@@ -111,12 +111,12 @@ function OSExt.Win32.getProcessImageFileName(process, nativeStyle)
     local ret = OSExt.Win32.Libs.kernel32.QueryFullProcessImageNameW(process, nativeStyle or false, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+        if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             buf = ffi.new("WCHAR[?]", lenBuf[0])
             ret = OSExt.Win32.Libs.kernel32.QueryFullProcessImageNameW(process, nativeStyle or false, buf, lenBuf)
-            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.HResults.ERROR_SUCCESS
+            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
         end
-        if e ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+        if e ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
             OSExt.Win32.raiseLuaError(e)
         end
     end

@@ -52,12 +52,12 @@ function OSExt.Win32.getUserNameEx(nameFormat)
     local ret = OSExt.Win32.Libs.secur32.GetUserNameExW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+        if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             buf = ffi.new("WCHAR[?]", lenBuf[0])
             ret = OSExt.Win32.Libs.secur32.GetUserNameExW(nameFormat, buf, lenBuf)
-            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.HResults.ERROR_SUCCESS
+            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
         end
-        if e ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+        if e ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
             OSExt.Win32.raiseLuaError(e)
         end
     end
@@ -81,12 +81,12 @@ function OSExt.Win32.getComputerObjectName(nameFormat)
     local ret = OSExt.Win32.Libs.secur32.GetComputerObjectNameW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
-        if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
+        if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             buf = ffi.new("WCHAR[?]", lenBuf[0])
             ret = OSExt.Win32.Libs.secur32.GetComputerObjectNameW(nameFormat, buf, lenBuf)
-            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.HResults.ERROR_SUCCESS
+            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
         end
-        if e ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+        if e ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
             OSExt.Win32.raiseLuaError(e)
         end
     end

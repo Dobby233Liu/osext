@@ -53,7 +53,7 @@ function OSExt.Win32.ToolHelp.Snapshot:init(contents, pid)
     if self._handle == OSExt.Win32.INVALID_HANDLE_VALUE then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         local msg = OSExt.Win32.makeErrorString(e)
-        if e == OSExt.Win32.HResults.ERROR_PARTIAL_COPY
+        if e == OSExt.Win32.Win32Errors.ERROR_PARTIAL_COPY
             and (OSExt.Win32.isWow64Process()
                 and not OSExt.Win32.isWow64Process(OSExt.Win32.openProcess(pid)))
         then
@@ -114,7 +114,7 @@ function OSExt.Win32.ToolHelp.Snapshot:iterHeapLists()
         end
         if not ret then
             local e = OSExt.Win32.Libs.kernel32.GetLastError()
-            if e == OSExt.Win32.HResults.ERROR_NO_MORE_FILES then
+            if e == OSExt.Win32.Win32Errors.ERROR_NO_MORE_FILES then
                 return nil
             end
             OSExt.Win32.raiseLuaError(e)
@@ -142,7 +142,7 @@ function OSExt.Win32.ToolHelp.Snapshot:iterHeapList(heapList)
         end
         if not ret then
             local e = OSExt.Win32.Libs.kernel32.GetLastError()
-            if e == OSExt.Win32.HResults.ERROR_NO_MORE_FILES then
+            if e == OSExt.Win32.Win32Errors.ERROR_NO_MORE_FILES then
                 return nil
             end
             OSExt.Win32.raiseLuaError(e)
@@ -194,7 +194,7 @@ function OSExt.Win32.ToolHelp.Snapshot:iterModules()
         end
         if not ret then
             local e = OSExt.Win32.Libs.kernel32.GetLastError()
-            if e == OSExt.Win32.HResults.ERROR_NO_MORE_FILES then
+            if e == OSExt.Win32.Win32Errors.ERROR_NO_MORE_FILES then
                 return nil
             end
             OSExt.Win32.raiseLuaError(e)
@@ -241,7 +241,7 @@ function OSExt.Win32.ToolHelp.Snapshot:iterProcesses()
         end
         if not ret then
             local e = OSExt.Win32.Libs.kernel32.GetLastError()
-            if e == OSExt.Win32.HResults.ERROR_NO_MORE_FILES then
+            if e == OSExt.Win32.Win32Errors.ERROR_NO_MORE_FILES then
                 return nil
             end
             OSExt.Win32.raiseLuaError(e)
@@ -285,7 +285,7 @@ function OSExt.Win32.ToolHelp.Snapshot:iterThreads()
         end
         if not ret then
             local e = OSExt.Win32.Libs.kernel32.GetLastError()
-            if e == OSExt.Win32.HResults.ERROR_NO_MORE_FILES then
+            if e == OSExt.Win32.Win32Errors.ERROR_NO_MORE_FILES then
                 return nil
             end
             OSExt.Win32.raiseLuaError(e)

@@ -74,7 +74,7 @@ ffi.cdef[[
     typedef LONG HRESULT;
     typedef LONG NTSTATUS;
 ]]
-OSExt.Win32.HResults = {
+OSExt.Win32.Win32Errors = {
     ERROR_SUCCESS = 0,
     ERROR_NO_MORE_FILES = 0x12,
     ERROR_INVALID_PARAMETER = 0x57,
@@ -88,6 +88,7 @@ OSExt.Win32.NtStatuses = {
 OSExt.Win32.NtStatusFacilities = {
     FACILITY_WIN32 = 7
 }
+libRequire("osext", "win32/dataclasses/status")
 
 libRequire("osext", "win32/ntdll")
 libRequire("osext", "win32/kernel32")
