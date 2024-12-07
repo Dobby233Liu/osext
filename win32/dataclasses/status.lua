@@ -117,7 +117,7 @@ function OSExt.Win32.Status:toNtStatus(_isHResult)
         code = bit.bor(code, bit.lshift(value, bitWidth - index - 1))
     end
 
-    if _isHResult and bit.band(self.severity, 0x1) == 1 then
+    if _isHResult and bit.band(self.severity, 0x1) == 1 and self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
         error("A severity of informational or error can't be used in an HRESULT")
     end
     code = bit.bor(code, bit.lshift(bit.band(self.severity, 0x3), 30)) -- Sev
