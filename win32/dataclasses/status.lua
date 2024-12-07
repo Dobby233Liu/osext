@@ -67,9 +67,9 @@ function OSExt.Win32.Status.fromNtStatus(ntStatus, _isHResult)
     local status = OSExt.Win32.Status()
     status.severity = bit.rshift(ntStatus, 30)
     local wasNtStatus = bit.band(bit.rshift(ntStatus, 28), 0x1) == 1
-    if _isHResult and bit.band(status.severity, 0x1) == 1 and not wasNtStatus then
+    --[[if _isHResult and bit.band(status.severity, 0x1) == 1 and not wasNtStatus then
         error("HRESULT should not have a severity of informational or error. Use fromNtStatus to convert NTSTATUS to Status")
-    end
+    end]]
     status.customer = bit.band(bit.rshift(ntStatus, 29), 0x1) == 1
     if _isHResult and not wasNtStatus then
         status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.hResult
@@ -117,9 +117,9 @@ function OSExt.Win32.Status:toNtStatus(_isHResult)
         code = bit.bor(code, bit.lshift(value, bitWidth - index - 1))
     end
 
-    if _isHResult and bit.band(self.severity, 0x1) == 1 and self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
+    --[[if _isHResult and bit.band(self.severity, 0x1) == 1 and self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
         error("A severity of informational or error can't be used in an HRESULT")
-    end
+    end]]
     code = bit.bor(code, bit.lshift(bit.band(self.severity, 0x3), 30)) -- Sev
     set(2, self.customer) -- C
     local facility = self.facility
