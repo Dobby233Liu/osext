@@ -85,8 +85,11 @@ OSExt.Win32.Win32Errors = {
 OSExt.Win32.NtStatuses = {
     STATUS_SUCCESS = 0
 }
-OSExt.Win32.NtStatusFacilities = {
+OSExt.Win32.HResultFacilities = {
     FACILITY_WIN32 = 7
+}
+OSExt.Win32.NtStatusFacilities = {
+    FACILITY_NTWIN32 = 7
 }
 libRequire("osext", "win32/dataclasses/status")
 
