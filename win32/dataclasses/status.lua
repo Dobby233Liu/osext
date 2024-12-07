@@ -7,29 +7,36 @@ local bit = require"bit"
 OSExt.Win32.Status = Class()
 
 ---@enum (key) OSExt.Win32.Status.SEVERITY
--- Maps to NTSTATUS' STATUS_SEVERITY_*
+-- STATUS_SEVERITY_* for NTSTATUSes
 OSExt.Win32.Status.SEVERITY = {
-    -- means success in HRESULT
     success = 0,
     informational = 1,
-    -- means failure in HRESULT
+    -- Win32 errors are warnings
     warning = 2,
     error = 3
 }
----@enum (key) OSExt.Win32.Status.FACILITY_MODES
+
+---@enum (key) OSExt.Win32.Status.FACILITY_KINDS
+-- HRESULT and NTSTATUS has different kinds of facilities
 OSExt.Win32.Status.FACILITY_KINDS = {
     hResult = 0,
     ntStatus = 1
+}
+
+-- TODO
+OSExt.Win32.Status.FACILITY_NT_TO_HR = {
+    [OSExt.Win32.HResultFacilities.FACILITY_WIN32] = OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32
 }
 
 
 ---@private
 -- (To be changed) Do NOT have code that manually inits a Status instance for now
 function OSExt.Win32.Status:init()
+    -- TODO: Reasonable defaults?
     self.customer = false
-    self.facility = 0 -- FIXME
+    self.facility = OSExt.Win32.HResultFacilities.FACILITY_WIN32
     self.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.hResult
-    self.code = 0 -- FIXME
+    self.code = OSExt.Win32.Win32Errors.ERROR_SUCCESS
     self.severity = OSExt.Win32.Status.SEVERITY.success
 end
 
@@ -43,7 +50,6 @@ function OSExt.Win32.Status.fromWin32Error(w32Error)
     if w32Error == OSExt.Win32.Win32Errors.ERROR_SUCCESS then
         status.severity = OSExt.Win32.Status.SEVERITY.success
     else
-        -- As far as I know anyway
         status.severity = OSExt.Win32.Status.SEVERITY.warning
     end
     return status
@@ -121,10 +127,7 @@ function OSExt.Win32.Status:toNtStatus(_isHResult)
         -- N is set to 1 if this was a NTSTATUS
         set(3, self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus) -- N
     elseif self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
-        -- TODO
-        facility = ({
-            [OSExt.Win32.HResultFacilities.FACILITY_WIN32] = OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32
-        })[self.facility]
+        facility = self.FACILITY_NT_TO_HR[self.facility]
         if not facility then
             error(string.format("HRESULT facility %d can't be corresponded to a NTSTATUS facility", self.facility))
         end
