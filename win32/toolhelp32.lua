@@ -300,11 +300,11 @@ end
 
 ffi.cdef[[
     BOOL Toolhelp32ReadProcessMemory(
-        DWORD       th32ProcessID,
-        ULONG_PTR   lpBaseAddress, // FIXME: this is supposed to be a LPCVOID
-        LPVOID      lpBuffer,
-        SIZE_T      cbRead,
-        SIZE_T      *lpNumberOfBytesRead
+        DWORD   th32ProcessID,
+        LPCVOID lpBaseAddress,
+        LPVOID  lpBuffer,
+        SIZE_T  cbRead,
+        SIZE_T  *lpNumberOfBytesRead
     );
 ]]
 
@@ -315,7 +315,7 @@ ffi.cdef[[
 function OSExt.Win32.ToolHelp.readProcessMemory(pid, address, size)
     local buffer = ffi.new("char[?]", size)
     local lenBuf = ffi.new("SIZE_T[1]", size)
-    local result = OSExt.Win32.Libs.tlhelp32.Toolhelp32ReadProcessMemory(pid, address, buffer, size, lenBuf)
+    local result = OSExt.Win32.Libs.tlhelp32.Toolhelp32ReadProcessMemory(pid, ffi.cast("uintptr_t", address), buffer, size, lenBuf)
     if not result then
         OSExt.Win32.raiseLastError()
     end
