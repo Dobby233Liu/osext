@@ -87,16 +87,16 @@ OSExt.Win32.FormatMessageFlags = {
     ignoreInserts = 0x00000200,
     allocateBuffer = 0x00000100
 }
--- For obtaining a user-facing message corresponding to a HRESULT \
+-- For obtaining a user-facing message corresponding to a system status \
 -- Note that there may be a trailing newline
----@param messageId integer # the HRESULT
+---@param messageId integer # the status (win32 error, hresult)
 ---@param languageId? integer # desired language of the resulting string, defaults to English (US)
 function OSExt.Win32.getSystemMessage(messageId, languageId)
     -- usually we shouldn't care about locale, but stock fonts have a limited charset
     languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
     -- FIXME: let the system allocate the buffer
-    local bufLen = 8192
+    local bufLen = 4096
     local buf = ffi.new("WCHAR[?]", bufLen+1)
     local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
         bit.bor(
@@ -108,7 +108,7 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
         nil
     )
     if len == 0 then
-        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        local e = OSExt.Win32.getLastWin32Error()
         -- guard against stack overflow
         OSExt.Win32.raiseLuaError(e, not Utils.containsValue({
             OSExt.Win32.Win32Errors.ERROR_INVALID_PARAMETER
@@ -116,7 +116,7 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
     end
     return OSExt.Win32.wideToLuaString(buf, len)
 end
--- {@func OSExt.Win32.getSystemMessage} which automatically trims trailing newlines
+-- [getSystemMessage](lua://OSExt.Win32.getSystemMessage) which automatically trims trailing newlines
 ---@overload fun(messageId: integer, languageId?: integer)
 function OSExt.Win32.getSystemMessageTrimmed(...)
     local rawMessage = OSExt.Win32.getSystemMessage(...)
@@ -127,12 +127,30 @@ function OSExt.Win32.getSystemMessageTrimmed(...)
     return rawMessage
 end
 
+
 ffi.cdef[[
     DWORD GetLastError();
+    void SetLastError(DWORD dwErrCode);
 ]]
 
+-- Gets the last Win32 error in integer format
+function OSExt.Win32.getLastWin32Error()
+    return OSExt.Win32.Libs.kernel32.GetLastError()
+end
+
+libRequire("osext", "win32/dataclasses/status")
+
+-- Sets the last Win32 error
+---@param err integer|OSExt.Win32.Status
+function OSExt.Win32.setLastWin32Error(err)
+    if isClass(err) and err:includes(OSExt.Win32.Status) then
+        return err:setAsWin32Error()
+    end
+    return OSExt.Win32.Libs.kernel32.SetLastError(err)
+end
+
 -- Makes a friendly error string from a Win32 API error
----@param w32Error integer # the HRESULT
+---@param w32Error integer # the Win32 error
 ---@param format? boolean # whether to get a readable error message or not
 function OSExt.Win32.makeErrorString(w32Error, format)
     if format == nil then format = true end
@@ -143,7 +161,7 @@ function OSExt.Win32.makeErrorString(w32Error, format)
     return string.format("Windows API operation failed with error: %s(0x%08x)", message, w32Error)
 end
 -- Raises a Lua error from a Win32 API error
----@param w32Error integer # the HRESULT
+---@param w32Error integer # the Win32 error
 ---@param format? boolean # whether to get a readable error message or not
 function OSExt.Win32.raiseLuaError(w32Error, format)
     if w32Error ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
@@ -153,7 +171,7 @@ end
 -- Raises a Lua error from the last Win32 API error
 ---@param format? boolean # whether to get a readable error message or not
 function OSExt.Win32.raiseLastError(format)
-    OSExt.Win32.raiseLuaError(OSExt.Win32.Libs.kernel32.GetLastError(), format)
+    OSExt.Win32.raiseLuaError(OSExt.Win32.getLastWin32Error(), format)
 end
 
 ffi.cdef[[
@@ -214,11 +232,11 @@ function OSExt.Win32.getComputerName(nameFormat)
     local lenBuf = ffi.new("DWORD[1]", len+1)
     local ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
     if not ret then
-        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        local e = OSExt.Win32.getLastWin32Error()
         if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             buf = ffi.new("WCHAR[?]", lenBuf[0])
             ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
-            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
+            e = ret and OSExt.Win32.getLastWin32Error() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
         end
         if e ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
             OSExt.Win32.raiseLuaError(e)

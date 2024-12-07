@@ -22,11 +22,11 @@ function OSExt.Win32.getUserName()
     local lenBuf = ffi.new("DWORD[1]", len+1)
     local ret = OSExt.Win32.Libs.advapi32.GetUserNameW(buf, lenBuf)
     if not ret then
-        local e = OSExt.Win32.Libs.kernel32.GetLastError()
+        local e = OSExt.Win32.getLastWin32Error()
         if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
             buf = ffi.new("WCHAR[?]", lenBuf[0])
             ret = OSExt.Win32.Libs.advapi32.GetUserNameW(buf, lenBuf)
-            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
+            e = ret and OSExt.Win32.getLastWin32Error() or OSExt.Win32.Win32Errors.ERROR_SUCCESS
         end
         if e ~= OSExt.Win32.Win32Errors.ERROR_SUCCESS then
             OSExt.Win32.raiseLuaError(e)

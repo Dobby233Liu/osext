@@ -1,6 +1,6 @@
 local bit = require"bit"
 
----@class OSExt.Win32.Status
+---@class OSExt.Win32.Status : Class
 -- WIP
 --
 -- [MS-ERREF](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/1bc92ddf-b79e-413c-bbaa-99a5281a6c90)
@@ -21,6 +21,7 @@ OSExt.Win32.Status.FACILITY_KINDS = {
     hResult = 0,
     ntStatus = 1
 }
+
 
 ---@private
 -- (To be changed) Do NOT have code that manually inits a Status instance for now
@@ -48,6 +49,10 @@ function OSExt.Win32.Status.fromWin32Error(w32Error)
     return status
 end
 
+function OSExt.Win32.Status.fromLastWin32Error()
+    return OSExt.Win32.Status.fromWin32Error(OSExt.Win32.getLastWin32Error())
+end
+
 function OSExt.Win32.Status.fromHResult(hResult)
     return OSExt.Win32.Status.fromNtStatus(hResult, true)
 end
@@ -59,8 +64,8 @@ function OSExt.Win32.Status.fromNtStatus(ntStatus, _isHResult)
         error("HRESULT should not have a severity of informational or error. Use fromNtStatus to convert NTSTATUS to Status")
     end
     status.customer = bit.band(bit.rshift(ntStatus, 29), 0x1) == 1
-    local bitN = bit.band(bit.rshift(ntStatus, 28), 0x1) == 1
-    if _isHResult and not bitN then
+    local wasNtStatus = bit.band(bit.rshift(ntStatus, 28), 0x1) == 1
+    if _isHResult and not wasNtStatus then
         status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.hResult
     else
         status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.ntStatus
@@ -78,9 +83,15 @@ function OSExt.Win32.Status:_sanityCheck()
     assert(self.code >= 0 and self.code <= 0xffff)
 end
 
+
+function OSExt.Win32.Status:getMessage(languageId)
+    return OSExt.Win32.getSystemMessageTrimmed(self:toHResult(), languageId)
+end
+
+
 function OSExt.Win32.Status:toWin32Error()
     self:_sanityCheck()
-    if not (not self.customer and self.facility == OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32) then
+    if self.customer or self.facility ~= OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32 then
         error("Can't convert non-Win32 Status to Win32 error code")
     end
     return self.code
@@ -110,6 +121,7 @@ function OSExt.Win32.Status:toNtStatus(_isHResult)
         -- N is set to 1 if this was a NTSTATUS
         set(3, self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus) -- N
     elseif self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
+        -- TODO
         facility = ({
             [OSExt.Win32.HResultFacilities.FACILITY_WIN32] = OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32
         })[self.facility]
@@ -121,4 +133,14 @@ function OSExt.Win32.Status:toNtStatus(_isHResult)
     code = bit.bor(code, bit.band(self.code, 0xffff))
 
     return code
+end
+
+
+function OSExt.Win32.Status:setAsWin32Error()
+    OSExt.Win32.Libs.kernel32.SetLastError(self:toWin32Error())
+end
+
+
+function OSExt.Win32.Status:needsAttention()
+    return self.severity >= self.SEVERITY.warning
 end

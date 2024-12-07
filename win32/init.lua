@@ -91,7 +91,6 @@ OSExt.Win32.HResultFacilities = {
 OSExt.Win32.NtStatusFacilities = {
     FACILITY_NTWIN32 = 7
 }
-libRequire("osext", "win32/dataclasses/status")
 
 libRequire("osext", "win32/ntdll")
 libRequire("osext", "win32/kernel32")
