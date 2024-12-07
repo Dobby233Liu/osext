@@ -9,6 +9,8 @@ OSExt.Win32.Libs = {}
 
 ffi.cdef[[
     typedef uint8_t BYTE;
+    typedef unsigned char UCHAR;
+    typedef unsigned short USHORT;
     typedef unsigned int UINT;
     typedef unsigned long DWORD;
     typedef unsigned long *PDWORD;
