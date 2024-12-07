@@ -13,6 +13,7 @@ ffi.cdef[[
     typedef unsigned long DWORD;
     typedef unsigned long *PDWORD;
     typedef unsigned long *LPDWORD;
+    typedef unsigned long ULONG;
     typedef unsigned long *PULONG;
     typedef uintptr_t ULONG_PTR;
     typedef ULONG_PTR SIZE_T;

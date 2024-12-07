@@ -13,17 +13,17 @@ end
 if not OSExt._typeExists("OSVERSIONINFOEXW") then
     ffi.cdef[[
         typedef struct _OSVERSIONINFOEXW {
-            ULONG  dwOSVersionInfoSize;
-            ULONG  dwMajorVersion;
-            ULONG  dwMinorVersion;
-            ULONG  dwBuildNumber;
-            ULONG  dwPlatformId;
-            WCHAR  szCSDVersion[128];
+            ULONG dwOSVersionInfoSize;
+            ULONG dwMajorVersion;
+            ULONG dwMinorVersion;
+            ULONG dwBuildNumber;
+            ULONG dwPlatformId;
+            WCHAR szCSDVersion[128];
             USHORT wServicePackMajor;
             USHORT wServicePackMinor;
             USHORT wSuiteMask;
-            UCHAR  wProductType;
-            UCHAR  wReserved;
+            UCHAR wProductType;
+            UCHAR wReserved;
         } OSVERSIONINFOEXW, *LPOSVERSIONINFOEXW;
     ]]
 end
