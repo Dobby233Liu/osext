@@ -34,9 +34,11 @@ function OSExt.Unix.getProcessExePath(pid)
     if not ret then
         local cmdlineFile = fs.open(procFs.."/cmdline", "r")
         local cmdlineStrBuf, cmdlineStrLen = cmdlineFile:readall()
-        local cmdline = ffi.string(cmdlineStrBuf, cmdlineStrLen)
-        if cmdline then
-            ret = Utils.split(cmdline, "\0")[1]
+        if cmdlineStrBuf then
+            local cmdline = ffi.string(cmdlineStrBuf, cmdlineStrLen)
+            if cmdline then
+                ret = Utils.split(cmdline, "\0")[1]
+            end
         end
     end
 

@@ -120,6 +120,7 @@ function OSExt.Unix.LinuxOSVer.getOSReleaseData()
         if not fs.is(file) then return nil end
         local osReleaseFile = fs.open(file, "r")
         local osReleaseStrBuf, osReleaseStrLen = osReleaseFile:readall()
+        if osReleaseStrBuf == nil then return nil end
         local ret = ffi.string(osReleaseStrBuf, osReleaseStrLen)
         osReleaseFile:close()
         return ret
