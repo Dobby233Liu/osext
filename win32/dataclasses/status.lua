@@ -48,12 +48,20 @@ function OSExt.Win32.Status.fromWin32Error(w32Error)
 end
 
 function OSExt.Win32.Status.fromHResult(hResult)
+    return OSExt.Win32.Status.fromNtStatus(hResult, true)
+end
+
+function OSExt.Win32.Status.fromNtStatus(ntStatus, _isHResult)
     local status = OSExt.Win32.Status()
-    status.severity = bit.rshift(hResult, 31) == 0 and OSExt.Win32.Status.SEVERITY.success or OSExt.Win32.Status.SEVERITY.error
-    status.customer = bit.band(bit.rshift(hResult, 29), 0x1) == 1
-    status.facility = bit.band(bit.rshift(hResult, 16), 0xfff)
-    status.facilityKind = bit.band(bit.rshift(hResult, 3), 0x1)
-    status.code = bit.band(hResult, 0x0000ffff)
+    status.severity = bit.rshift(ntStatus, 30)
+    status.customer = bit.band(bit.rshift(ntStatus, 29), 0x1) == 1
+    local bitN = bit.band(bit.rshift(ntStatus, 28), 0x1) == 1
+    status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.ntStatus
+    if _isHResult and not bitN then
+        status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.hResult
+    end
+    status.facility = bit.band(bit.rshift(ntStatus, 16), 0xffff)
+    status.code = bit.band(ntStatus, 0xffff)
     return status
 end
 
