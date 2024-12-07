@@ -115,9 +115,13 @@ function OSExt.Win32.getProcessImageFileName(process, nativeStyle)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
-            error("Internal error - buffer is too small, my fault")
+            buf = ffi.new("WCHAR[?]", lenBuf[0])
+            ret = OSExt.Win32.Libs.kernel32.QueryFullProcessImageNameW(process, nativeStyle or false, buf, lenBuf)
+            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.HResults.ERROR_SUCCESS
         end
-        OSExt.Win32.raiseLuaError(e)
+        if e ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+            OSExt.Win32.raiseLuaError(e)
+        end
     end
     return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end

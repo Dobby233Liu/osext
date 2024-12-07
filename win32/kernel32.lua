@@ -211,14 +211,18 @@ function OSExt.Win32.getComputerName(nameFormat)
 
     local len = 256
     local buf = ffi.new("WCHAR[?]", len+1)
-    local lenBuf = ffi.new("DWORD[1]", len+1) -- seriously
+    local lenBuf = ffi.new("DWORD[1]", len+1)
     local ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
     if not ret then
         local e = OSExt.Win32.Libs.kernel32.GetLastError()
         if e == OSExt.Win32.HResults.ERROR_MORE_DATA then
-            error("Internal error - buffer is too small, my fault")
+            buf = ffi.new("WCHAR[?]", lenBuf[0])
+            ret = OSExt.Win32.Libs.kernel32.GetComputerNameExW(nameFormat, buf, lenBuf)
+            e = ret and OSExt.Win32.Libs.kernel32.GetLastError() or OSExt.Win32.HResults.ERROR_SUCCESS
         end
-        OSExt.Win32.raiseLuaError(e)
+        if e ~= OSExt.Win32.HResults.ERROR_SUCCESS then
+            OSExt.Win32.raiseLuaError(e)
+        end
     end
     return OSExt.Win32.wideToLuaString(buf, lenBuf[0])
 end
