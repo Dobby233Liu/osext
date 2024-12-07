@@ -62,8 +62,7 @@ ffi.cdef[[
 ---@return string imageName
 function OSExt.Win32.getProcessImageFileNameNative(process)
     --process = OSExt.Win32.markHandleForGC(process)
-    ---@diagnostic disable-next-line: assign-type-mismatch
-    local len = ffi.C.MAX_PATH ---@type integer
+    local len = OSExt.Win32.MAX_PATH
     local buf = ffi.new("WCHAR[?]", len)
     local ret = OSExt.Win32.Libs.kernel32.K32GetProcessImageFileNameW(process, buf, len)
     if not ret then
@@ -83,8 +82,7 @@ end
 ---@return string imageName
 function OSExt.Win32.getModuleBaseName(process, module)
     --process = OSExt.Win32.markHandleForGC(process)
-    ---@diagnostic disable-next-line: assign-type-mismatch
-    local len = ffi.C.MAX_PATH ---@type integer
+    local len = OSExt.Win32.MAX_PATH
     local buf = ffi.new("WCHAR[?]", len)
     local ret = OSExt.Win32.Libs.kernel32.K32GetModuleBaseNameW(process, module, buf, len)
     if not ret then
@@ -107,8 +105,7 @@ ffi.cdef[[
 ---@return string imageName
 function OSExt.Win32.getProcessImageFileName(process, nativeStyle)
     --process = OSExt.Win32.markHandleForGC(process)
-    ---@diagnostic disable-next-line: assign-type-mismatch
-    local len = ffi.C.MAX_PATH ---@type integer
+    local len = OSExt.Win32.MAX_PATH
     local buf = ffi.new("WCHAR[?]", len)
     local lenBuf = ffi.new("DWORD[1]", len)
     local ret = OSExt.Win32.Libs.kernel32.QueryFullProcessImageNameW(process, nativeStyle or false, buf, lenBuf)

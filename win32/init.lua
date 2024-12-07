@@ -68,6 +68,8 @@ if not OSExt._typeExists("char[MAX_PATH]") then
     ]]
 end
 
+OSExt.Win32.MAX_PATH = 260
+
 ffi.cdef[[
     typedef LONG HRESULT;
     typedef LONG NTSTATUS;
