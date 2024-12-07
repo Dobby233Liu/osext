@@ -66,11 +66,11 @@ end
 function OSExt.Win32.Status.fromNtStatus(ntStatus, _isHResult)
     local status = OSExt.Win32.Status()
     status.severity = bit.rshift(ntStatus, 30)
-    if _isHResult and bit.band(status.severity, 0x1) == 1 then
+    local wasNtStatus = bit.band(bit.rshift(ntStatus, 28), 0x1) == 1
+    if _isHResult and bit.band(status.severity, 0x1) == 1 and not wasNtStatus then
         error("HRESULT should not have a severity of informational or error. Use fromNtStatus to convert NTSTATUS to Status")
     end
     status.customer = bit.band(bit.rshift(ntStatus, 29), 0x1) == 1
-    local wasNtStatus = bit.band(bit.rshift(ntStatus, 28), 0x1) == 1
     if _isHResult and not wasNtStatus then
         status.facilityKind = OSExt.Win32.Status.FACILITY_KINDS.hResult
     else
