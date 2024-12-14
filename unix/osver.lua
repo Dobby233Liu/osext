@@ -73,6 +73,27 @@ function OSExt.Unix.getKernelVersion()
     }
 end
 
+-- Returns the name and information about the current kernel using /proc/sys/kernel/ files.
+-- In case using uname is unfestible, this is a fallback. HOWEVER, it might only work on Linux anyways.
+function OSExt.Unix.getKernelVersionAlt()
+    local function readFile(name)
+        local file = fs.open("/proc/sys/kernel/"..name, "r")
+        local strBuf, strLen = file:readall()
+        if strBuf then
+            return ffi.string(strBuf, strLen)
+        end
+    end
+
+    return {
+        systemName  = readFile("ostype"),
+        nodeName    = readFile("hostname"),
+        release     = readFile("osrelease"),
+        version     = readFile("version"),
+        machine     = ffi.arch,
+        domainName  = readFile("domainname")
+    }
+end
+
 
 if ffi.os == "Linux" then
     libRequire("osext", "unix/osver_linux")
