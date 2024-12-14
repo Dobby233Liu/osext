@@ -96,7 +96,7 @@ ffi.cdef[[
         LPCVOID lpSource,
         DWORD dwMessageId,
         DWORD dwLanguageId,
-        LPWSTR lpBuffer,
+        UINT_PTR lpBuffer, // FIXME: LPWSTR
         DWORD nSize,
         va_list *Arguments
     );
@@ -141,9 +141,10 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
         OSExt.Win32.raiseLuaError(e, not Utils.containsValue({
             OSExt.Win32.Win32Errors.ERROR_INVALID_PARAMETER
         }, e))
+        return
     end
-    local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", buf[1]), len)
-    OSExt.Win32.Libs.kernel32.LocalFree(buf[1])
+    ffi.gc(buf[0], OSExt.Win32.Libs.kernel32.LocalFree)
+    local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", buf[0]), len)
     return ret
 end
 -- [getSystemMessage](lua://OSExt.Win32.getSystemMessage) which automatically trims trailing newlines
