@@ -91,7 +91,14 @@ end
 
 
 function OSExt.Win32.Status:getMessage(languageId)
-    return OSExt.Win32.getSystemMessageTrimmed(self:toHResult(), languageId)
+    if self.customer then
+        error("Can't get message for customer status")
+    end
+    if self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus then
+        -- It is necessary to get it from ntdll's message table
+        return OSExt.Win32.getMessageTrimmed(self:toNtStatus(), languageId, OSExt.Win32.NTDLL_MODULE, true)
+    end
+    return OSExt.Win32.getMessageTrimmed(self:toHResult(), languageId)
 end
 
 

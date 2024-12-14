@@ -72,6 +72,24 @@ function OSExt.Win32.luaToWideString(str)
 end
 
 ffi.cdef[[
+    HMODULE LoadLibraryW(LPCWSTR lpLibFileName);
+]]
+-- Loads a DLL
+---@param path string
+---@return OSExt.Win32.HMODULE?
+function OSExt.Win32.loadLibrary(path)
+    local module = OSExt.Win32.Libs.kernel32.LoadLibraryW(OSExt.Win32.luaToWideString(path))
+    if not module then
+        local e = OSExt.Win32.getLastWin32Error()
+        if e == OSExt.Win32.Win32Errors.ERROR_FILE_NOT_FOUND then
+            return nil
+        end
+        OSExt.Win32.raiseLuaError(e)
+    end
+    return OSExt.Win32.markHandleForGC(module)
+end
+
+ffi.cdef[[
     DWORD FormatMessageW(
         DWORD dwFlags,
         LPCVOID lpSource,
@@ -84,25 +102,32 @@ ffi.cdef[[
 ]]
 OSExt.Win32.FormatMessageFlags = {
     fromSystem = 0x00001000,
+    fromHModule = 0x00000800,
     ignoreInserts = 0x00000200,
     allocateBuffer = 0x00000100
 }
--- For obtaining a user-facing message corresponding to a system status \
+-- For obtaining a user-facing message corresponding, either from the system or from a module \
 -- Note that there may be a trailing newline
----@param messageId integer # the status (win32 error, hresult)
+---@param messageId integer # message ID; when module is nil, the status (win32 error, hresult)
 ---@param languageId? integer # desired language of the resulting string, defaults to English (US)
-function OSExt.Win32.getSystemMessage(messageId, languageId)
+---@param module? OSExt.Win32.HMODULE # module handle, defaults to nil (system)
+---@param systemFallback? boolean # whether to fallback to the system. recommended if querying from ntdll
+function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
     -- usually we shouldn't care about locale, but stock fonts have a limited charset
     languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
     -- FIXME: let the system allocate the buffer
     local bufLen = 4096
     local buf = ffi.new("WCHAR[?]", bufLen+1)
+    local flags = OSExt.Win32.FormatMessageFlags.ignoreInserts
+    if module then
+        flags = bit.bor(flags, OSExt.Win32.FormatMessageFlags.fromHModule)
+    end
+    if not module or systemFallback then
+        flags = bit.bor(flags, OSExt.Win32.FormatMessageFlags.fromSystem)
+    end
     local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
-        bit.bor(
-            OSExt.Win32.FormatMessageFlags.fromSystem,
-            OSExt.Win32.FormatMessageFlags.ignoreInserts
-        ), nil,
+        flags, module,
         messageId, languageId,
         buf, bufLen+1,
         nil
@@ -118,8 +143,8 @@ function OSExt.Win32.getSystemMessage(messageId, languageId)
 end
 -- [getSystemMessage](lua://OSExt.Win32.getSystemMessage) which automatically trims trailing newlines
 ---@overload fun(messageId: integer, languageId?: integer)
-function OSExt.Win32.getSystemMessageTrimmed(...)
-    local rawMessage = OSExt.Win32.getSystemMessage(...)
+function OSExt.Win32.getMessageTrimmed(...)
+    local rawMessage = OSExt.Win32.getMessage(...)
     local len = utf8.len(rawMessage)
     if Utils.sub(rawMessage, len-1, len) == "\r\n" then
         rawMessage = Utils.sub(rawMessage, 1, len-2)
@@ -156,7 +181,7 @@ function OSExt.Win32.makeErrorString(w32Error, format)
     if format == nil then format = true end
     local message = ""
     if format then
-        message = OSExt.Win32.getSystemMessageTrimmed(w32Error) .. " "
+        message = OSExt.Win32.getMessageTrimmed(w32Error) .. " "
     end
     return string.format("Windows API operation failed with error: %s(0x%08x)", message, w32Error)
 end
