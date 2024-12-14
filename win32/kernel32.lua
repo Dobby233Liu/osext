@@ -78,7 +78,8 @@ ffi.cdef[[
 ---@param path string
 ---@return OSExt.Win32.HMODULE?
 function OSExt.Win32.loadLibrary(path)
-    local module = OSExt.Win32.Libs.kernel32.LoadLibraryW(OSExt.Win32.luaToWideString(path))
+    local pathWstr, _ = OSExt.Win32.luaToWideString(path)
+    local module = OSExt.Win32.Libs.kernel32.LoadLibraryW(pathWstr)
     if not module then
         local e = OSExt.Win32.getLastWin32Error()
         if e == OSExt.Win32.Win32Errors.ERROR_FILE_NOT_FOUND then
