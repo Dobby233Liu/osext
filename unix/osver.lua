@@ -33,7 +33,6 @@ function OSExt.Unix.getKernelVersion()
 
     local strucContents = ffi.string(ffi.cast("void *", struc), ffi.sizeof(struc))
     local parts = Utils.filter(Utils.split(strucContents, "\0"), function(x) return x ~= "" end)
-    print(Utils.dump(parts))
     --assert(#parts == 5 or #parts == 6, "uname() returned an unexpected number of fields")
 
     return {
