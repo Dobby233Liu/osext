@@ -22,6 +22,29 @@ ffi.cdef[[
     int uname(utsname_hack *buf);
 ]]
 
+---@param str string
+local function splitNull(str)
+    local t = {}
+    local i = 1
+    local s = ""
+    local last_char = ""
+    while i <= str:len() do
+        local char = str:sub(i, i)
+        if char == "\0" then
+            s = ""
+            if char ~= last_char then
+                table.insert(t, s)
+            end
+        else
+            s = s .. char
+        end
+        last_char = char
+        i = i + 1
+    end
+    table.insert(t, s)
+    return t
+end
+
 -- Returns the name and information about the current kernel.
 function OSExt.Unix.getKernelVersion()
     local struc = ffi.new("char[?]", (64 + 1) * 6)
@@ -32,7 +55,7 @@ function OSExt.Unix.getKernelVersion()
     if ret ~= 0 then OSExt.Unix.raiseLastError() end
 
     local strucContents = ffi.string(ffi.cast("void *", struc), ffi.sizeof(struc))
-    local parts = Utils.splitFast(strucContents, "\0")
+    local parts = splitNull(strucContents)
     --assert(#parts == 5 or #parts == 6, "uname() returned an unexpected number of fields")
 
     return {
