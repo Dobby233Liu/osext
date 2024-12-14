@@ -79,7 +79,7 @@ end
 function OSExt.Unix.getUserPasswdByName(name, copy)
     assert(name) -- TODO
     -- FIXME: thread-unsafe
-    local res = ffi.C.getpwnam(uid)
+    local res = ffi.C.getpwnam(name)
     if not res then OSExt.Unix.raiseLastError() end
     if copy then
         local buf = ffi.new("passwd[1]")
