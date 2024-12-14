@@ -46,8 +46,8 @@ local function splitNull(str)
     return t
 end
 
--- Returns the name and information about the current kernel.
-function OSExt.Unix.getKernelVersion()
+-- Returns the name and information about the current kernel from the uname syscall.
+function OSExt.Unix.uname()
     local struc = ffi.new("char[?]", (64 + 1) * 6)
     ffi.fill(struc, ffi.sizeof(struc))
     local strucOut = ffi.cast("utsname_hack*", struc)
@@ -74,16 +74,18 @@ function OSExt.Unix.getKernelVersion()
     }
 end
 
--- Returns the name and information about the current kernel using /proc/sys/kernel/ files.
+-- Returns the name and information about the current kernel using /proc/sys/kernel/ files. \
 -- In case using uname is unfestible, this is a fallback. HOWEVER, it might only work on Linux anyways.
-function OSExt.Unix.getKernelVersionAlt()
+--
+-- machine will not have the same values as uname() returns.
+function OSExt.Unix.getKernelVersionFromProcFs()
     local function readFile(name)
         local file = fs.open("/proc/sys/kernel/"..name, "r")
         if not file then return nil end
         local strBuf, strLen = file:readall_hungry()
         print("/proc/sys/kernel/"..name, strBuf, strLen)
         if strBuf then
-            return ffi.string(strBuf, strLen)
+            return Utils.trim(ffi.string(strBuf, strLen))
         end
     end
 
@@ -95,6 +97,15 @@ function OSExt.Unix.getKernelVersionAlt()
         machine     = ffi.arch,
         domainName  = readFile("domainname")
     }
+end
+
+-- Returns the name and information about the current kernel.
+function OSExt.Unix.getKernelVersion()
+    local uname = OSExt.Unix.uname()
+    if not uname then
+        return OSExt.Unix.getKernelVersionFromProcFs()
+    end
+    return uname
 end
 
 
