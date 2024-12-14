@@ -117,10 +117,12 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
     -- usually we shouldn't care about locale, but stock fonts have a limited charset
     languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
-    -- FIXME: let the system allocate the buffer
-    local bufLen = 4096
-    local buf = ffi.new("WCHAR[?]", bufLen+1)
-    local flags = OSExt.Win32.FormatMessageFlags.ignoreInserts
+    local buf = ffi.new("uintptr_t[1]")
+    local flags = bit.bor(
+        -- TODO: support arguments
+        OSExt.Win32.FormatMessageFlags.ignoreInserts,
+        OSExt.Win32.FormatMessageFlags.allocateBuffer
+    )
     if module then
         flags = bit.bor(flags, OSExt.Win32.FormatMessageFlags.fromHModule)
     end
@@ -130,7 +132,7 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
     local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
         flags, module,
         messageId, languageId,
-        buf, bufLen+1,
+        buf, 512,
         nil
     )
     if len == 0 then
@@ -140,7 +142,9 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
             OSExt.Win32.Win32Errors.ERROR_INVALID_PARAMETER
         }, e))
     end
-    return OSExt.Win32.wideToLuaString(buf, len)
+    local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", buf[1]), len)
+    OSExt.Win32.Libs.kernel32.LocalFree(buf[1])
+    return ret
 end
 -- [getSystemMessage](lua://OSExt.Win32.getSystemMessage) which automatically trims trailing newlines
 ---@overload fun(messageId: integer, languageId?: integer)
