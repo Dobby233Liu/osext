@@ -15,7 +15,7 @@ ffi.cdef[[
 function OSExt.Unix.getHostName()
     if ffi.os == "Linux" or not ffi.C.gethostname then
         -- on Linux glibc implements this by looking in uname
-        return OSExt.Unix.LinuxOSVer.getKernelVersion().nodeName
+        return OSExt.Unix.getKernelVersion().nodeName
     end
 
     local buf = ffi.new("char[?]", OSExt.Unix.MAX_HOSTNAME)
@@ -30,7 +30,7 @@ function OSExt.Unix.getDomainName()
     if ffi.os == "Linux" or not ffi.C.getdomainname then
         -- glibc implements this by looking in uname
         -- if the domainname field exists in utsname
-        return OSExt.Unix.LinuxOSVer.getKernelVersion().domainName
+        return OSExt.Unix.getKernelVersion().domainName
     end
 
     local buf = ffi.new("char[?]", OSExt.Unix.MAX_DOMAINNAME)

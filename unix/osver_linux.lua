@@ -3,49 +3,6 @@ local fs = OSExt.Unix.fs
 
 OSExt.Unix.LinuxOSVer = {}
 
--- HACK: Property sizes in struct utsname varies from system to system.
--- Without doing weird crap like loading system headers, we can't know the exact size.
--- So, we just assume it's 64 + 1 for each of the 5/6 fields; and instead of having a struct
--- definition, we just use a char* and split it by \0.
---
--- TODO: "Part of the utsname information is also accessible via
---          /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}."
--- That would allow us to avoid using the absolutely dreadful uname() call...
-
-if not OSExt._typeExists("utsname_hack") then
-    ffi.cdef[[
-        typedef char *utsname_hack;
-    ]]
-end
-ffi.cdef[[
-    int uname(utsname_hack *buf);
-]]
-
--- Returns the name and information about the current kernel.
-function OSExt.Unix.LinuxOSVer.getKernelVersion()
-    local struc = ffi.new("char[?]", (64 + 1) * 6)
-    ffi.fill(struc, ffi.sizeof(struc))
-
-    local ret = ffi.C.uname(struc)
-    if ret ~= 0 then OSExt.Unix.raiseLastError() end
-
-    local parts = Utils.split(ffi.string(struc), "\0")
-    table.remove(parts, #parts) -- remove the last empty string
-    --assert(#parts == 5 or #parts == 6, "uname() returned an unexpected number of fields")
-
-    local function nilIfEmpty(x)
-        return x == "" and nil or x
-    end
-    return {
-        systemName  = nilIfEmpty(parts[1]),
-        nodeName    = nilIfEmpty(parts[2]),
-        release     = nilIfEmpty(parts[3]),
-        version     = nilIfEmpty(parts[4]),
-        machine     = nilIfEmpty(parts[5]),
-        domainName  = nilIfEmpty(parts[6]) -- GNU-only
-    }
-end
-
 
 ---@class OSExt.Unix.LinuxOSVer.OSReleaseData # Rough representation of the os-release file.
 ---@field name string?
