@@ -143,9 +143,9 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
         }, e))
         return
     end
-    print(buf[0])
-    ffi.gc(buf[0], OSExt.Win32.Libs.kernel32.LocalFree)
-    local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", buf[0]), len)
+    local strPtr = ffi.cast("WCHAR*", buf[0])
+    ffi.gc(strPtr, OSExt.Win32.Libs.kernel32.LocalFree)
+    local ret = OSExt.Win32.wideToLuaString(strPtr, len)
     return ret
 end
 -- [getSystemMessage](lua://OSExt.Win32.getSystemMessage) which automatically trims trailing newlines
