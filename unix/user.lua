@@ -58,16 +58,15 @@ ffi.cdef[[
 function OSExt.Unix.getUserPasswd(uid, copy)
     if uid == nil then uid = OSExt.Unix.getRealUserId() end
     -- FIXME: thread-unsafe
-    local retO = ffi.C.getpwuid(uid)
-    if not retO then OSExt.Unix.raiseLastError() end
-    local ret
+    local res = ffi.C.getpwuid(uid)
+    if not res then OSExt.Unix.raiseLastError() end
     if copy then
-        ret = ffi.new("passwd")
-        ffi.copy(ret, retO, ffi.sizeof("passwd"))
+        local buf = ffi.new("passwd[1]")
+        ffi.copy(buf[0], res, ffi.sizeof("passwd"))
+        return buf[0]
     else
-        ret = retO
+        return res
     end
-    return ret
 end
 
 -- Gets the passwd entry for the user with the given name.
@@ -80,16 +79,15 @@ end
 function OSExt.Unix.getUserPasswdByName(name, copy)
     assert(name) -- TODO
     -- FIXME: thread-unsafe
-    local retO = ffi.C.getpwnam(uid)
-    if not retO then OSExt.Unix.raiseLastError() end
-    local ret
+    local res = ffi.C.getpwnam(uid)
+    if not res then OSExt.Unix.raiseLastError() end
     if copy then
-        ret = ffi.new("passwd")
-        ffi.copy(ret, retO, ffi.sizeof("passwd"))
+        local buf = ffi.new("passwd[1]")
+        ffi.copy(buf[0], res, ffi.sizeof("passwd"))
+        return buf[0]
     else
-        ret = retO
+        return res
     end
-    return ret
 end
 
 
