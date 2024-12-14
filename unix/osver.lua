@@ -30,7 +30,7 @@ function OSExt.Unix.getKernelVersion()
     local ret = ffi.C.uname(struc)
     if ret ~= 0 then OSExt.Unix.raiseLastError() end
 
-    local parts = Utils.split(ffi.string(struc), "\0", true)
+    local parts = Utils.split(ffi.string(struc), "\0")
     --assert(#parts == 5 or #parts == 6, "uname() returned an unexpected number of fields")
 
     local function nilIfEmpty(x)
