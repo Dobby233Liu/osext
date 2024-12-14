@@ -143,6 +143,7 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
         }, e))
         return
     end
+    print(buf[0])
     ffi.gc(buf[0], OSExt.Win32.Libs.kernel32.LocalFree)
     local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", buf[0]), len)
     return ret
