@@ -1,4 +1,5 @@
 local ffi = require "ffi"
+local fs = OSExt.Unix.fs
 
 
 -- HACK: Property sizes in struct utsname varies from system to system.
