@@ -26,8 +26,9 @@ ffi.cdef[[
 function OSExt.Unix.getKernelVersion()
     local struc = ffi.new("char[?]", (64 + 1) * 6)
     ffi.fill(struc, ffi.sizeof(struc))
+    local strucOut = ffi.cast("utsname_hack*", struc)
 
-    local ret = ffi.C.uname(struc)
+    local ret = ffi.C.uname(strucOut)
     if ret ~= 0 then OSExt.Unix.raiseLastError() end
 
     local parts = Utils.split(ffi.string(struc), "\0")
