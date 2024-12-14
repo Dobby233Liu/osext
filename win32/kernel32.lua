@@ -117,7 +117,7 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
     -- usually we shouldn't care about locale, but stock fonts have a limited charset
     languageId = languageId or 0x0409 -- MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US)
 
-    local buf = ffi.new("uint64_t[1]")
+    local buf = ffi.new("uintptr_t[1]")
     local flags = bit.bor(
         -- TODO: support arguments
         OSExt.Win32.FormatMessageFlags.ignoreInserts,
@@ -132,7 +132,7 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
     local len = OSExt.Win32.Libs.kernel32.FormatMessageW(
         flags, module,
         messageId, languageId,
-        buf, 512,
+        ffi.cast("uintptr_t", buf), 512,
         nil
     )
     if len == 0 then
@@ -142,7 +142,7 @@ function OSExt.Win32.getMessage(messageId, languageId, module, systemFallback)
             OSExt.Win32.Win32Errors.ERROR_INVALID_PARAMETER
         }, e))
     end
-    local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", ffi.cast("uintptr_t", buf[1])), len)
+    local ret = OSExt.Win32.wideToLuaString(ffi.cast("WCHAR*", buf[1]), len)
     OSExt.Win32.Libs.kernel32.LocalFree(buf[1])
     return ret
 end
