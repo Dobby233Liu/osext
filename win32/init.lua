@@ -36,6 +36,7 @@ ffi.cdef[[
 ffi.cdef[[
     typedef wchar_t WCHAR;
     typedef WCHAR *LPWSTR;
+    typedef const WCHAR *LPCWSTR;
 
     typedef char CHAR;
     typedef CHAR *LPSTR;
