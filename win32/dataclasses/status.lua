@@ -154,3 +154,35 @@ end
 function OSExt.Win32.Status:needsAttention()
     return self.severity >= self.SEVERITY.warning
 end
+
+-- Makes a friendly error string
+---@param format? boolean # whether to get a readable error message or not
+-- FIXME: redudancy
+function OSExt.Win32.Status:makeErrorString(format)
+    if format == nil then format = true end
+    local message = ""
+    if format then
+        message = self:getMessage() .. " "
+    end
+    local fTypeStr = "Windows API operation"
+    local errorCode
+    if self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus then
+        fTypeStr = "NT API operation"
+        errorCode = self:toNtStatus()
+    else
+        errorCode = self:toHResult()
+    end
+    return string.format("%s failed with error: %s(0x%08x)", fTypeStr, message, errorCode)
+end
+
+function OSExt.Win32.Status:raise(format)
+    if self.severity ~= self.SEVERITY.error
+        and self.facility ~= OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32 or self.severity ~= self.SEVERITY.warning
+    then
+        if self.severity > self.SEVERITY.success then
+            print("[WARNING] "..self:makeErrorString(format))
+        end
+        return
+    end
+    error(self:makeErrorString(format))
+end
