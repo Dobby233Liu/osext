@@ -49,26 +49,46 @@ ffi.cdef[[
 ]]
 
 -- Gets the passwd entry for the user with the given UID.
--- The result should NOT be freed.
+-- The result should NOT be freed. In addition, with subsequent calls to this function,
+-- the result will likely be clobbered, unless `copy` is true, in which case the result
+-- (except strings) will be copied. (TODO)
 ---@param uid? OSExt.Unix.uid # defaults to the real UID
+---@param copy? boolean # whether to duplicate the result. defaults to false
 ---@return OSExt.Unix.passwd passwd
-function OSExt.Unix.getUserPasswd(uid)
+function OSExt.Unix.getUserPasswd(uid, copy)
     if uid == nil then uid = OSExt.Unix.getRealUserId() end
     -- FIXME: thread-unsafe
-    local ret = ffi.C.getpwuid(uid)
-    if not ret then OSExt.Unix.raiseLastError() end
+    local retO = ffi.C.getpwuid(uid)
+    if not retO then OSExt.Unix.raiseLastError() end
+    local ret
+    if copy then
+        ret = ffi.new("passwd")
+        ffi.copy(ret, retO, ffi.sizeof("passwd"))
+    else
+        ret = retO
+    end
     return ret
 end
 
 -- Gets the passwd entry for the user with the given name.
--- The result should NOT be freed.
+-- The result should NOT be freed. In addition, with subsequent calls to this function,
+-- the result will likely be clobbered, unless `copy` is true, in which case the result
+-- (except strings) will be copied. (TODO)
 ---@param name string
+---@param copy? boolean # whether to duplicate the result. defaults to false
 ---@return OSExt.Unix.passwd passwd
-function OSExt.Unix.getUserPasswdByName(name)
+function OSExt.Unix.getUserPasswdByName(name, copy)
     assert(name) -- TODO
     -- FIXME: thread-unsafe
-    local ret = ffi.C.getpwnam(name)
-    if not ret then OSExt.Unix.raiseLastError() end
+    local retO = ffi.C.getpwnam(uid)
+    if not retO then OSExt.Unix.raiseLastError() end
+    local ret
+    if copy then
+        ret = ffi.new("passwd")
+        ffi.copy(ret, retO, ffi.sizeof("passwd"))
+    else
+        ret = retO
+    end
     return ret
 end
 
