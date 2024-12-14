@@ -47,6 +47,8 @@ local function splitNull(str)
 end
 
 -- Returns the name and information about the current kernel from the uname syscall.
+--
+-- Just in case, you may want to use getKernelVersion() instead.
 function OSExt.Unix.uname(_ignoreErrors)
     local struc = ffi.new("char[?]", (64 + 1) * 6)
     ffi.fill(struc, ffi.sizeof(struc))
@@ -75,7 +77,9 @@ function OSExt.Unix.uname(_ignoreErrors)
         release     = parts[3],
         version     = parts[4],
         machine     = parts[5],
-        domainName  = parts[6] -- GNU-only
+        -- NTS: This is NOT the same as nodeName.
+        -- It's for the NIS domain name and could very well be empty.
+        domainName  = parts[6] -- GNU extension
     }
 end
 
@@ -89,8 +93,10 @@ function OSExt.Unix.getKernelVersionFromProcFs()
         if not file then return nil end
         local strBuf, strLen = file:readall_hungry()
         if strBuf then
-            return Utils.trim(ffi.string(strBuf, strLen))
+            local ret = Utils.trim(ffi.string(strBuf, strLen))
+            if ret ~= "" then return ret end
         end
+        return nil
     end
 
     return {
