@@ -9,10 +9,6 @@ local fs = OSExt.Unix.fs
 -- (For each entry's size Linux has 65, AIX has 32, and BSD/Solaris has 256,
 --  so it's not like we can just assume 64 for all of them, but ffs I'm not
 --  allocating that much memory...)
---
--- TODO: "Part of the utsname information is also accessible via
---          /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}."
--- That would allow us to avoid using the absolutely dreadful uname() call...
 
 if not OSExt._typeExists("utsname_hack") then
     ffi.cdef[[
@@ -83,8 +79,10 @@ function OSExt.Unix.uname(_ignoreErrors)
     }
 end
 
--- Returns the name and information about the current kernel using /proc/sys/kernel/ files. \
--- In case using uname is unfestible, this is a fallback. HOWEVER, it might only work on Linux anyways.
+-- Returns the name and information about the current kernel using /proc/sys/kernel files. \
+-- In case using uname is unfestible, this is a fallback.
+-- However, it's strongly unlikely that this will work on non-Linux systems, and on Linux,
+-- it's rather certain that the provided uname interop will work.
 --
 -- machine is not provided by this.
 function OSExt.Unix.getKernelVersionFromProcFs()
