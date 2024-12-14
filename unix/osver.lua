@@ -80,6 +80,7 @@ function OSExt.Unix.getKernelVersionAlt()
     local function readFile(name)
         local file = fs.open("/proc/sys/kernel/"..name, "r")
         local strBuf, strLen = file:readall()
+        print(strBuf, strLen)
         if strBuf then
             return ffi.string(strBuf, strLen)
         end

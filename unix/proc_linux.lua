@@ -10,11 +10,12 @@ end
 -- Gets the path to the executable of the process corresponding to the given PID.
 function OSExt.Unix.getProcessExePath(pid)
     local procFs = OSExt.Unix.getProcessFs(pid)
+    local exeSymPath = procFs.."/exe"
     -- Try to resolve the "exe" symlink - most reliable
-    local ret = fs.readlink(procFs.."/exe")
+    local ret = fs.readlink(exeSymPath)
 
     -- If that fails, try to read the "cmdline" file - less reliable
-    if not ret then
+    if not ret or ret == exeSymPath then
         local cmdlineFile = fs.open(procFs.."/cmdline", "r")
         local cmdlineStrBuf, cmdlineStrLen = cmdlineFile:readall()
         if cmdlineStrBuf then
