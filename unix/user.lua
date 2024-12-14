@@ -49,9 +49,11 @@ ffi.cdef[[
 ]]
 
 -- Gets the passwd entry for the user with the given UID.
+--
 -- The result should NOT be freed. In addition, with subsequent calls to this function,
 -- the result will likely be clobbered, unless `copy` is true, in which case the result
 -- (except strings) will be copied. (TODO)
+--
 ---@param uid? OSExt.Unix.uid # defaults to the real UID
 ---@param copy? boolean # whether to duplicate the result. defaults to false
 ---@return OSExt.Unix.passwd passwd
@@ -71,9 +73,11 @@ function OSExt.Unix.getUserPasswd(uid, copy)
 end
 
 -- Gets the passwd entry for the user with the given name.
+--
 -- The result should NOT be freed. In addition, with subsequent calls to this function,
 -- the result will likely be clobbered, unless `copy` is true, in which case the result
 -- (except strings) will be copied. (TODO)
+--
 ---@param name string
 ---@param copy? boolean # whether to duplicate the result. defaults to false
 ---@return OSExt.Unix.passwd passwd
