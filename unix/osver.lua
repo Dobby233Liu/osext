@@ -33,7 +33,7 @@ function OSExt.Unix.getKernelVersion()
 
     local strucContents = ffi.string(ffi.cast("void *", struc), ffi.sizeof(struc))
     local parts = Utils.split(strucContents, "\0")
-    print(parts)
+    print(Utils.dump(parts))
     --assert(#parts == 5 or #parts == 6, "uname() returned an unexpected number of fields")
 
     local function nilIfEmpty(x)
