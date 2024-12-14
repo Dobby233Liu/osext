@@ -1,23 +1,6 @@
 local ffi = require "ffi"
 local fs = OSExt.Unix.fs
 
----@alias OSExt.Unix.pid integer
-
-ffi.cdef[[
-    typedef int pid_t;
-]]
-
-ffi.cdef[[
-    pid_t getpid(void);
-    pid_t getppid(void);
-]]
-
--- Gets the PID of the current process.
-function OSExt.Unix.getCurrentProcessId()
-    -- can't fail
-    return ffi.C.getpid()
-end
-
 -- Gets the path to the /proc directory corresponding to the given PID.
 function OSExt.Unix.getProcessFs(pid)
     if pid == nil then pid = OSExt.Unix.getCurrentProcessId() end
