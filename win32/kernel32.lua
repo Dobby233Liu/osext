@@ -96,7 +96,8 @@ ffi.cdef[[
         LPCVOID lpSource,
         DWORD dwMessageId,
         DWORD dwLanguageId,
-        ULONG_PTR lpBuffer, // FIXME: LPWSTR
+        // FIXME: If this is left be LPWSTR then ffi will try to convert this to ushort*
+        ULONG_PTR lpBuffer,
         DWORD nSize,
         va_list *Arguments
     );
