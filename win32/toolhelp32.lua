@@ -332,6 +332,7 @@ end
 function OSExt.Win32.getProcessNames()
     local snapshot = OSExt.Win32.ToolHelp.Snapshot(OSExt.Win32.ToolHelp.SnapshotContents.processList)
     local names = {}
+    print(ffi.sizeof(process.szExeFile))
     for _, process in snapshot:iterProcesses() do
         table.insert(names, OSExt.Win32.wideToLuaString(process.szExeFile, ffi.sizeof(process.szExeFile)))
     end
