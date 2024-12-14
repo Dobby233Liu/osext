@@ -47,13 +47,18 @@ local function splitNull(str)
 end
 
 -- Returns the name and information about the current kernel from the uname syscall.
-function OSExt.Unix.uname()
+function OSExt.Unix.uname(_ignoreErrors)
     local struc = ffi.new("char[?]", (64 + 1) * 6)
     ffi.fill(struc, ffi.sizeof(struc))
     local strucOut = ffi.cast("utsname_hack*", struc)
 
     local ret = ffi.C.uname(strucOut)
-    if ret ~= 0 then OSExt.Unix.raiseLastError() end
+    if ret ~= 0 then
+        if not _ignoreErrors then
+            OSExt.Unix.raiseLastError()
+        end
+        return nil
+    end
 
     local strucContents = ffi.string(ffi.cast("void *", struc), ffi.sizeof(struc))
     local parts = splitNull(strucContents)
@@ -77,13 +82,12 @@ end
 -- Returns the name and information about the current kernel using /proc/sys/kernel/ files. \
 -- In case using uname is unfestible, this is a fallback. HOWEVER, it might only work on Linux anyways.
 --
--- machine will not have the same values as uname() returns.
+-- machine is not provided by this.
 function OSExt.Unix.getKernelVersionFromProcFs()
     local function readFile(name)
         local file = fs.open("/proc/sys/kernel/"..name, "r")
         if not file then return nil end
         local strBuf, strLen = file:readall_hungry()
-        print("/proc/sys/kernel/"..name, strBuf, strLen)
         if strBuf then
             return Utils.trim(ffi.string(strBuf, strLen))
         end
@@ -94,16 +98,22 @@ function OSExt.Unix.getKernelVersionFromProcFs()
         nodeName    = readFile("hostname"),
         release     = readFile("osrelease"),
         version     = readFile("version"),
-        machine     = ffi.arch,
         domainName  = readFile("domainname")
     }
 end
 
 -- Returns the name and information about the current kernel.
+--
+-- If uname() fails, it will try to read the information from /proc/sys/kernel/ files.
+-- In this case, the machine fields will not have the same information as uname().
+-- (as it is acquired from ffilib)
 function OSExt.Unix.getKernelVersion()
-    local uname = OSExt.Unix.uname()
+    local uname = OSExt.Unix.uname(true)
     if not uname then
-        return OSExt.Unix.getKernelVersionFromProcFs()
+        uname = OSExt.Unix.getKernelVersionFromProcFs()
+    end
+    if not uname.machine then
+        uname.machine = ffi.arch
     end
     return uname
 end
