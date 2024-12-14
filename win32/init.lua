@@ -71,8 +71,14 @@ if not OSExt._typeExists("char[MAX_PATH]") then
         enum { MAX_PATH = 260 };
     ]]
 end
+if not OSExt._typeExists("char[MAX_MODULE_NAME32]") then
+    ffi.cdef[[
+        enum { MAX_MODULE_NAME32 = 255 }
+    ]]
+end
 
 OSExt.Win32.MAX_PATH = 260
+OSExt.Win32.MAX_MODULE_NAME32 = 255
 
 ffi.cdef[[
     typedef LONG HRESULT;

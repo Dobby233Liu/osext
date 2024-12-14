@@ -153,11 +153,6 @@ function OSExt.Win32.ToolHelp.Snapshot:iterHeapList(heapList)
 end
 
 
-if not OSExt._typeExists("char[MAX_MODULE_NAME32 + 1]") then
-    ffi.cdef[[
-        enum { MAX_MODULE_NAME32 = 255 }
-    ]]
-end
 if not OSExt._typeExists("MODULEENTRY32W") then
     ffi.cdef[[
         typedef struct tagMODULEENTRY32W {

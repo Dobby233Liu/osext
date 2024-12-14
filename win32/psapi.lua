@@ -82,9 +82,9 @@ end
 ---@return string imageName
 function OSExt.Win32.getModuleBaseName(process, module)
     --process = OSExt.Win32.markHandleForGC(process)
-    local len = OSExt.Win32.MAX_PATH
-    local buf = ffi.new("WCHAR[?]", len)
-    local ret = OSExt.Win32.Libs.kernel32.K32GetModuleBaseNameW(process, module, buf, len)
+    local bufLen = OSExt.Win32.MAX_MODULE_NAME32
+    local buf = ffi.new("WCHAR[?]", bufLen + 1)
+    local ret = OSExt.Win32.Libs.kernel32.K32GetModuleBaseNameW(process, module, buf, bufLen)
     if not ret then
         local e = OSExt.Win32.getLastWin32Error()
         if e == OSExt.Win32.Win32Errors.ERROR_MORE_DATA then
@@ -92,7 +92,7 @@ function OSExt.Win32.getModuleBaseName(process, module)
         end
         OSExt.Win32.raiseLuaError(e)
     end
-    return OSExt.Win32.wideToLuaString(buf, len)
+    return OSExt.Win32.wideToLuaString(buf, ret)
 end
 
 
