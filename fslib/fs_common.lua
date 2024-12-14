@@ -272,6 +272,9 @@ function file:readall(expires)
 		assert(false)
 	end
 end
+function file:readall_hungry(expires)
+	return readall(self.read, self, expires)
+end
 
 --filesystem operations ------------------------------------------------------
 

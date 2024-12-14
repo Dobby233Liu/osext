@@ -17,15 +17,18 @@ function OSExt.Unix.getProcessExePath(pid)
     -- If that fails, try to read the "cmdline" file - less reliable
     if not ret or ret == exeSymPath then
         local cmdlineFile = fs.open(procFs.."/cmdline", "r")
-        local cmdlineStrBuf, cmdlineStrLen = cmdlineFile:readall()
-        if cmdlineStrBuf then
-            local cmdline = ffi.string(cmdlineStrBuf, cmdlineStrLen)
-            if cmdline then
-                ret = Utils.split(cmdline, "\0")[1]
+        if cmdlineFile then
+            local cmdlineStrBuf, cmdlineStrLen = cmdlineFile:readall_hungry()
+            if cmdlineStrBuf then
+                local cmdline = ffi.string(cmdlineStrBuf, cmdlineStrLen)
+                if cmdline then
+                    ret = Utils.split(cmdline, "\0")[1]
+                end
             end
         end
     end
 
+    if ret == exeSymPath then return nil end
     return ret
 end
 

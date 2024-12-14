@@ -31,6 +31,7 @@ FILE I/O
 	f:read(buf, len) -> readlen                   read data from file
 	f:readn(buf, n) -> true                       read exactly n bytes
 	f:readall() -> buf, len                       read until EOF into a buffer
+	f:readall_hungry() -> buf, len                read until EOF into a buffer (hungry)
 	f:write(s | buf,len) -> true                  write data to file
 	f:flush()                                     flush buffers
 	f:seek([whence] [, offset]) -> pos            get/set the file pointer
@@ -252,6 +253,12 @@ f:readn(buf, len, [expires]) -> true
 f:readall([expires]) -> buf, len
 
 	Read until EOF into a buffer.
+
+f:readall_hungry([expires]) -> buf, len
+
+	Read until EOF into a buffer, disregarding size stat.
+	This is necessary for some system files in POSIX systems, which have
+	indeterminate sizes.
 
 f:write(s | buf,len) -> true
 
