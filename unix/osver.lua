@@ -32,12 +32,13 @@ function OSExt.Unix.getKernelVersion()
     if ret ~= 0 then OSExt.Unix.raiseLastError() end
 
     local strucContents = ffi.string(ffi.cast("void *", struc), ffi.sizeof(struc))
-    print(strucContents)
     local parts = Utils.split(strucContents, "\0")
+    print(parts)
     --assert(#parts == 5 or #parts == 6, "uname() returned an unexpected number of fields")
 
     local function nilIfEmpty(x)
-        return x == "" and nil or x
+        if x == "" then return nil end
+        return x
     end
     return {
         systemName  = nilIfEmpty(parts[1]),
