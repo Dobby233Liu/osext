@@ -61,9 +61,10 @@ function OSExt.Unix.getUserPasswd(uid, copy)
     local res = ffi.C.getpwuid(uid)
     if not res then OSExt.Unix.raiseLastError() end
     if copy then
-        local buf = ffi.new("passwd[1]")
-        ffi.copy(buf[0], res, ffi.sizeof("passwd"))
-        return buf[0]
+        local buf = ffi.new("passwd")
+        ffi.copy(buf, res, ffi.sizeof("passwd"))
+        ---@diagnostic disable-next-line: return-type-mismatch
+        return buf
     else
         return res
     end
@@ -82,9 +83,10 @@ function OSExt.Unix.getUserPasswdByName(name, copy)
     local res = ffi.C.getpwnam(name)
     if not res then OSExt.Unix.raiseLastError() end
     if copy then
-        local buf = ffi.new("passwd[1]")
-        ffi.copy(buf[0], res, ffi.sizeof("passwd"))
-        return buf[0]
+        local buf = ffi.new("passwd")
+        ffi.copy(buf, res, ffi.sizeof("passwd"))
+        ---@diagnostic disable-next-line: return-type-mismatch
+        return buf
     else
         return res
     end
