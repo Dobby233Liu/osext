@@ -96,7 +96,7 @@ ffi.cdef[[
         LPCVOID lpSource,
         DWORD dwMessageId,
         DWORD dwLanguageId,
-        UINT_PTR lpBuffer, // FIXME: LPWSTR
+        ULONG_PTR lpBuffer, // FIXME: LPWSTR
         DWORD nSize,
         va_list *Arguments
     );
