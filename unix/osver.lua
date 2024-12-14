@@ -31,10 +31,10 @@ local function splitNull(str)
     while i <= str:len() do
         local char = str:sub(i, i)
         if char == "\0" then
-            s = ""
             if char ~= last_char then
                 table.insert(t, s)
             end
+            s = ""
         else
             s = s .. char
         end
