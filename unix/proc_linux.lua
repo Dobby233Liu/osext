@@ -14,6 +14,8 @@ function OSExt.Unix.getProcessExePath(pid)
     -- Try to resolve the "exe" symlink - most reliable
     local ret = fs.readlink(exeSymPath)
 
+    -- TODO: comm
+
     -- If that fails, try to read the "cmdline" file - less reliable
     if not ret or ret == exeSymPath then
         local cmdlineFile = fs.open(procFs.."/cmdline", "r")

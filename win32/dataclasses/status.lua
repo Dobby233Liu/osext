@@ -92,7 +92,8 @@ end
 
 function OSExt.Win32.Status:getMessage(languageId)
     if self.customer then
-        error("Can't get message for customer status")
+        -- error("Can't get message for customer status")
+        return nil
     end
     if self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus then
         -- It is necessary to get it from ntdll's message table
@@ -129,15 +130,19 @@ function OSExt.Win32.Status:toNtStatus(_isHResult)
     end]]
     code = bit.bor(code, bit.lshift(bit.band(self.severity, 0x3), 30)) -- Sev
     set(2, self.customer) -- C
-    local facility = self.facility
-    if _isHResult then
-        -- N is set to 1 if this was a NTSTATUS
-        set(3, self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus) -- N
-    elseif self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
-        facility = self.FACILITY_NT_TO_HR[self.facility]
-        if not facility then
-            error(string.format("HRESULT facility %d can't be corresponded to a NTSTATUS facility", self.facility))
+    if not self.customer then
+        local facility = self.facility
+        if _isHResult then
+            -- N is set to 1 if this was a NTSTATUS
+            set(3, self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus) -- N
+        elseif self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.hResult then
+            facility = self.FACILITY_NT_TO_HR[self.facility]
+            if not facility then
+                error(string.format("HRESULT facility %d can't be corresponded to a NTSTATUS facility", self.facility))
+            end
         end
+    else
+        set(3, self.facilityKind == 1)
     end
     code = bit.bor(code, bit.lshift(bit.band(facility, 0xfff), 16))
     code = bit.bor(code, bit.band(self.code, 0xffff))
@@ -162,22 +167,30 @@ function OSExt.Win32.Status:makeErrorString(format)
     if format == nil then format = true end
     local message = ""
     if format then
-        message = self:getMessage() .. " "
+        local real_msg = self:getMessage()
+        if real_msg then
+            message = real_msg .. " "
+        end
     end
     local fTypeStr = "Windows API operation"
     local errorCode
-    if self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus then
-        fTypeStr = "NT API operation"
-        errorCode = self:toNtStatus()
+    if not self.customer then
+        if self.facilityKind == OSExt.Win32.Status.FACILITY_KINDS.ntStatus then
+            fTypeStr = "NT API operation"
+            errorCode = self:toNtStatus()
+        else
+            errorCode = self:toHResult()
+        end
     else
-        errorCode = self:toHResult()
+        fTypeStr = "Operation"
+        errorCode = self:toNtStatus()
     end
     return string.format("%s failed with error: %s(0x%08x)", fTypeStr, message, errorCode)
 end
 
 function OSExt.Win32.Status:raise(format)
     if self.severity ~= self.SEVERITY.error
-        and self.facility ~= OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32 or self.severity ~= self.SEVERITY.warning
+        and (self.facility ~= OSExt.Win32.NtStatusFacilities.FACILITY_NTWIN32 or self.severity ~= self.SEVERITY.warning)
     then
         if self.severity > self.SEVERITY.success then
             print("[WARNING] "..self:makeErrorString(format))
